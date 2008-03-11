@@ -7,3 +7,40 @@
  *
  * @note only hooks are here.
  */
+
+/**
+ * Immplementation of hook_chartsapi().
+ *
+ * Its a Charts module hook. It defines almost all aspects
+ * of a chart provider, like its name, what types of charts
+ * it can perform and what are the restrictions.
+ */
+function google_charts_chartsinfo($op) {
+  switch ($op) {
+    case 'list':
+      return array('google_charts' => 'Google Chart API');
+
+    case 'charttypes':
+      return array(
+        'line2D'  => t('Line 2D'),
+        'hbar2D'  => t('Horizontal Bar 2D'),
+        'vbar2D'  => t('Vertical Bar 2D'),
+        'pie2D'   => t('Pie 2D'),
+        'pie3D'   => t('Pie 2D'),
+        'venn'    => t('Venn'),
+        'scatter' => t('Scatter Plot'),
+      );
+  }
+}
+
+/**
+ * Immplementation of hook_chartsapi().
+ *
+ * Its a Charts module hook. It transform the data into a HTML chart.
+ *
+ * @param &$data
+ *   Array. The
+ */
+function google_charts_chartsapi(&$data) {
+  return 'TODO Google Charts';
+}
