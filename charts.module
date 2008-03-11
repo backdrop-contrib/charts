@@ -14,8 +14,8 @@
  * to print the given data.
  *
  * @param $chart_provider
- *   String. The chart provider. With this module you might install
- *   'googlechart', 'openflashchart' and 'fusioncharts'
+ *   String. The chart provider code. With this module you might install
+ *   'google_charts', 'openflashchart' and 'fusioncharts'
  * @param &$data
  *   Array. The chart data, described on chart_api.txt
  * @return
@@ -23,8 +23,8 @@
  *   JavaScript external files)
  */
 function charts_chart($chart_provider, &$data) {
-  if (function_exists()) {
-    $chart_provider = $chart_provider .'_chartapi';
+  $chart_provider = $chart_provider .'_chartsapi';
+  if (function_exists($chart_provider)) {
     return $chart_provider($data);
   }
 }
