@@ -1,6 +1,6 @@
 <?php
+// $Id$
 /**
- * $Id$
  * @author Bruno Massa http://drupal.org/user/67164
  * @file charts.module
  * Transform DATA into INFORMATION using beautiful CHARTS.
@@ -8,3 +8,48 @@
  * @note only hooks are here.
  * @note For instructions about the API, see chart_api.txt file.
  */
+
+/**
+ * The main Chart API function, that calls any chart provider
+ * to print the given data.
+ *
+ * @param $chart_provider
+ *   String. The chart provider. With this module you might install
+ *   'googlechart', 'openflashchart' and 'fusioncharts'
+ * @param &$data
+ *   Array. The chart data, described on chart_api.txt
+ * @return
+ *   String. The HTML with the propper chart (might include Flash or
+ *   JavaScript external files)
+ */
+function charts_chart($chart_provider, &$data) {
+  if (function_exists()) {
+    $chart_provider = $chart_provider .'_printchart';
+    return $chart_provider($data);
+  }
+}
+
+/**
+ * Implementation of hook_menu().
+ */
+function charts_menu() {
+  $items['admin/settings/charts'] = array(
+    'file'            => 'charts.inc',
+    'page callback'   => 'drupal_get_form',
+    'page arguments'  => array('_charts_settings'),
+    'title'           => 'Charts'
+  );
+  $items['admin/settings/charts/settings'] = array(
+    'page arguments'  => array('_charts_settings'),
+    'title'           => 'Settings',
+    'type'            => MENU_DEFAULT_LOCAL_TASK,
+  );
+  $items['admin/settings/charts/testing'] = array(
+    'file'            => 'charts.inc',
+    'page callback'   => 'drupal_get_form',
+    'page arguments'  => array('_charts_testing'),
+    'title'           => 'Testing',
+    'type'            => MENU_LOCAL_TASK,
+  );
+  return $items;
+}
