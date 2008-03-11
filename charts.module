@@ -6,4 +6,5 @@
  * Transform DATA into INFORMATION using beautiful CHARTS.
  *
  * @note only hooks are here.
+ * @note For instructions about the API, see chart_api.txt file.
  */
