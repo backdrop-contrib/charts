@@ -1,0 +1,4 @@
+; $Id$
+core        = "6.x"
+description = "Transform DATA into INFORMATION using beautiful CHARTS."
+name        = "Charts"
