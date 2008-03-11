@@ -1,0 +1,11 @@
+<?php
+// $Id$
+/**
+ * @author Bruno Massa http://drupal.org/user/67164
+ * @file charts.install
+ * Install and unistall functions for this module
+ */
+
+function charts_uninstall() {
+  variable_del('charts_settings');
+}
