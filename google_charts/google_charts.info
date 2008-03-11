@@ -1,4 +1,5 @@
 ; $Id$
-core        = "6.x"
-description = "Use Google Charts on your site."
-name        = "Charts: Google"
+core            = "6.x"
+description     = "Use Google Charts on your site."
+name            = "Charts: Google"
+dependencies[]  = charts
