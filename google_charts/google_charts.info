@@ -1,4 +1,4 @@
 ; $Id$
 core        = "6.x"
 description = "Use Google Charts on your site."
-name        = "Google Charts"
+name        = "Charts: Google"
