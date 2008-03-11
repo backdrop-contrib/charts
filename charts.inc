@@ -14,12 +14,16 @@
  */
 function _charts_settings() {
   // Get the previously saved data from Data Base
-  $data = variable_get('charts_settings', array());
+  $settings = variable_get('charts_settings', array());
 
   // This will hold the example chart
-  if (!empty($data)) {
+  if (!empty($settings)) {
+    // Since the chart is an example, we should provide
+    // and example data.
+    $settings['data'] = array(10, 20, 55, 72, 35, 23);
+
     $form['chart'] = array(
-      '#value'          => charts_chart($data['basic']['provider'], $data)
+      '#value'          => charts_chart($settings['basic']['provider'], $settings)
     );
   }
 
@@ -38,14 +42,14 @@ function _charts_settings() {
   );
   $options = module_invoke_all('chartsinfo', 'list');
   $form['basic']['provider'] = array(
-    '#default_value'  => empty($data['basic']['provider']) ? '' : $data['basic']['provider'],
+    '#default_value'  => empty($settings['basic']['provider']) ? '' : $settings['basic']['provider'],
     '#options'        => $options,
     '#type'           => 'select',
     '#title'          => t('Chart provider'),
   );
   $options = module_invoke_all('chartsinfo', 'charttypes');
   $form['basic']['charttype'] = array(
-    '#default_value'  => empty($data['basic']['charttype']) ? '' : $data['basic']['charttype'],
+    '#default_value'  => empty($settings['basic']['charttype']) ? '' : $settings['basic']['charttype'],
     '#options'        => $options,
     '#type'           => 'select',
     '#title'          => t('Chart type'),
@@ -62,19 +66,19 @@ function _charts_settings() {
     '#tree'           => TRUE
   );
   $form['layout']['background_color'] = array(
-    '#default_value'  => empty($data['layout']['background_color']) ? 'ffffff' : $data['layout']['background_color'],
+    '#default_value'  => empty($settings['layout']['background_color']) ? 'ffffff' : $settings['layout']['background_color'],
     '#description'    => t('Use the hexadecimal RGB value'),
     '#type'           => 'textfield',
     '#title'          => t('Background Color'),
   );
   $form['layout']['width'] = array(
-    '#default_value'  => empty($data['layout']['width']) ? 200 : $data['layout']['width'],
+    '#default_value'  => empty($settings['layout']['width']) ? 400 : $settings['layout']['width'],
     '#description'    => t('The chart width, in pixels'),
     '#type'           => 'textfield',
     '#title'          => t('Width'),
   );
   $form['layout']['height'] = array(
-    '#default_value'  => empty($data['layout']['height']) ? 100 : $data['layout']['height'],
+    '#default_value'  => empty($settings['layout']['height']) ? 200 : $settings['layout']['height'],
     '#description'    => t('The chart height, in pixels'),
     '#type'           => 'textfield',
     '#title'          => t('Height'),
@@ -96,11 +100,11 @@ function _charts_settings() {
  */
 function _charts_settings_submit(&$form, &$form_state) {
   // Build the chart settings
-  $data['basic']  = $form_state['values']['basic'];
-  $data['layout'] = $form_state['values']['layout'];
+  $settings['basic']  = $form_state['values']['basic'];
+  $settings['layout'] = $form_state['values']['layout'];
 
   // Save the data into database
-  variable_set('charts_settings', $data);
+  variable_set('charts_settings', $settings);
 
   // Print a 'OK' message
   drupal_set_message('Settings saved');
@@ -114,12 +118,12 @@ function _charts_settings_submit(&$form, &$form_state) {
  */
 function _charts_testing() {
   // Get the previously saved data from Data Base
-  $data = variable_get('charts_settings', array());
+  $settings = variable_get('charts_settings', array());
 
   // This will hold the example chart
-  if (!empty($data)) {
+  if (!empty($settings)) {
     $form['chart'] = array(
-      '#value'          => charts_chart($data['basic']['provider'], $data)
+      '#value'          => charts_chart($settings['basic']['provider'], $data)
     );
   }
 
