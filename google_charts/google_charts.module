@@ -1,0 +1,9 @@
+<?php
+/**
+ * $Id$
+ * @author Bruno Massa http://drupal.org/user/67164
+ * @file google_charts.module
+ * Use Google Charts on your site.
+ *
+ * @note only hooks are here.
+ */
