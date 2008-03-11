@@ -1,0 +1,5 @@
+; $Id$
+core            = "6.x"
+description     = "Use FusionCharts on your site."
+name            = "Charts: FusionCharts"
+dependencies[]  = charts
