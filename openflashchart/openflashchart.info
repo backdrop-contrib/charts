@@ -1,0 +1,5 @@
+; $Id$
+core            = "6.x"
+description     = "Use Open Flash Charts on your site."
+name            = "Charts: Open Flash Chart"
+dependencies[]  = charts

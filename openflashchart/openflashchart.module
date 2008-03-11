@@ -1,0 +1,31 @@
+<?php
+// $Id$
+/**
+ * @author Bruno Massa http://drupal.org/user/67164
+ * @file openflashcha.module
+ * Use Open Flash Chart on your site.
+ *
+ * @note only hooks are here.
+ */
+
+/**
+ * Immplementation of hook_chartsapi().
+ *
+ * Its a Charts module hook. It defines almost all aspects
+ * of a chart provider, like its name, what types of charts
+ * it can perform and what are the restrictions.
+ */
+function openflashchart_chartsinfo($op) {
+  switch ($op) {
+    case 'list':
+      return array('google_charts' => 'Open Flash Chart');
+
+    case 'charttypes':
+      return array(
+        'line2D'  => t('Line 2D'),
+        'hbar2D'  => t('Horizontal Bar 2D'),
+        'vbar2D'  => t('Vertical Bar 2D'),
+        'pie2D'   => t('Pie 2D'),
+      );
+  }
+}
