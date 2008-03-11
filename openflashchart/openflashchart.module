@@ -2,7 +2,7 @@
 // $Id$
 /**
  * @author Bruno Massa http://drupal.org/user/67164
- * @file openflashcha.module
+ * @file openflashchart.module
  * Use Open Flash Chart on your site.
  *
  * @note only hooks are here.
@@ -18,7 +18,7 @@
 function openflashchart_chartsinfo($op) {
   switch ($op) {
     case 'list':
-      return array('google_charts' => 'Open Flash Chart');
+      return array('openflashchart' => 'Open Flash Chart');
 
     case 'charttypes':
       return array(
@@ -28,4 +28,16 @@ function openflashchart_chartsinfo($op) {
         'pie2D'   => t('Pie 2D'),
       );
   }
+}
+
+/**
+ * Immplementation of hook_chartsapi().
+ *
+ * Its a Charts module hook. It transform the data into a HTML chart.
+ *
+ * @param &$data
+ *   Array. The
+ */
+function openflashchart_chartsapi(&$data) {
+  return 'TESTING';
 }
