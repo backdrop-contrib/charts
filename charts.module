@@ -24,7 +24,7 @@
  */
 function charts_chart($chart_provider, &$data) {
   if (function_exists()) {
-    $chart_provider = $chart_provider .'_printchart';
+    $chart_provider = $chart_provider .'_chartapi';
     return $chart_provider($data);
   }
 }
@@ -52,4 +52,18 @@ function charts_menu() {
     'type'            => MENU_LOCAL_TASK,
   );
   return $items;
+}
+
+/**
+ * Implementation of hook_requirements().
+ */
+function charts_requirements($phase) {
+  if ($phase == 'runtime' and !$modules = module_invoke_all('chartsinfo', 'list')) {
+    $requirements['charts']['title']        = t('Charts');
+    $requirements['charts']['value']        = t('No Charts provider installed');
+    $requirements['charts']['severity']     = REQUIREMENT_ERROR;
+    $requirements['charts']['description']  = t('Charts core module only provides a a common set of functions. You must install a Charts provider module to create charts.');
+
+    return $requirements;
+  }
 }
