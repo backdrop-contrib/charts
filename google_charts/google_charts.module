@@ -78,7 +78,7 @@ function google_charts_chartsapi(&$data) {
   if (empty($data['data'])) {
     return '';
   }
-  $options = _google_charts_codingsimple($data['data'], max($data['data']));
+  $options = _google_charts_codingsimple($data['data']);
   $chart[] = 'chd='. $options;
 
   // If its all ok, build the HTML img tag

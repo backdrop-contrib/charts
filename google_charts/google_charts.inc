@@ -16,31 +16,41 @@
  * _google_charts_codingextended(), which produces a 4000 levels,
  * but also a bigger URL string.
  *
- * @param $values
+ * @param $data
  *   Array. A series of numeric data values
- * @param $max
- *   Number. The biggest number to be the reference point
  */
-function _google_charts_codingsimple($values, $max) {
+function _google_charts_codingsimple($data) {
   // Set the list of characters and the size of the list
-  $simple_encoding = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  $strlen = strlen($simple_encoding) - 1;
+  $simple = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  $simple_len = strlen($simple) - 1;
 
   // The final output is going to be build
-  $chart_data = 's:';
+  $chart_data = '';
 
   // For each chart value, encode it
   // Note: Underscore represents a missing value
-  foreach ($values as $current_value) {
-    if ($current_value >= 0) {
-      $chart_data .= $simple_encoding[(round($strlen * $current_value / $max))];
+  foreach ($data as $series) {
+    // Include a series separator
+    if (!empty($chart_data)) {
+      $chart_data .= '|';
     }
-    else {
-      $chart_data .= '_';
+
+    // Get the highest value on the series, to be a reference point
+    $max = max($series);
+
+    // For each series of data, scan it
+    foreach ($series as $value) {
+      if ($value >= 0) {
+        $chart_data .= $simple[round($simple_len * $value / $max)];
+      }
+      else {
+        $chart_data .= '_';
+      }
     }
   }
 
-  return $chart_data;
+  // Return the series of data
+  return 's:'. $chart_data;
 }
 
 function _google_charts_codingextended() {
