@@ -19,7 +19,7 @@
  * @param $data
  *   Array. A series of numeric data values
  */
-function _google_charts_codingsimple($data) {
+function _google_charts_data_codingsimple($data) {
   // Set the list of characters and the size of the list
   $simple = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   $simple_len = strlen($simple) - 1;
@@ -53,5 +53,5 @@ function _google_charts_codingsimple($data) {
   return 's:'. $chart_data;
 }
 
-function _google_charts_codingextended() {
+function _google_charts_data_codingextended() {
 }

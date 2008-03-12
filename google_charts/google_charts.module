@@ -78,8 +78,7 @@ function google_charts_chartsapi(&$data) {
   if (empty($data['data'])) {
     return '';
   }
-  $options = _google_charts_codingsimple($data['data']);
-  $chart[] = 'chd='. $options;
+  $chart[] = 'chd='. _google_charts_data_codingsimple($data['data']);
 
   // If its all ok, build the HTML img tag
   return '<img src="http://chart.apis.google.com/chart?'. implode('&amp;', $chart) .'" />';
