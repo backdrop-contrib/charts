@@ -7,6 +7,31 @@
  */
 
 /**
+ * Invoke a hook in all enabled modules that implement it.
+ *
+ * Its copy of module_invoke_all()
+ * @see module_invoke_all()
+ */
+function _charts_module_invoke_all() {
+  $args = func_get_args();
+  $hook = $args[0];
+  unset($args[0]);
+  $return = array();
+  foreach (module_implements($hook) as $module) {
+    $function = $module .'_'. $hook;
+    $result = call_user_func_array($function, $args);
+    if (isset($result) && is_array($result)) {
+      $return += $result;
+    }
+    else if (isset($result)) {
+      $return[] = $result;
+    }
+  }
+
+  return $return;
+}
+
+/**
  * Module settings page. Users can set the default layout
  * of their charts.
  *
@@ -20,7 +45,9 @@ function _charts_settings() {
   if (!empty($settings)) {
     // Since the chart is an example, we should provide
     // and example data.
-    $settings['data'] = array(10, 20, 55, 72, 35, 23);
+    $settings['data'] = array(
+      array(10, 20, 55, 72, 35, 23)
+    );
 
     $form['chart'] = array(
       '#value'          => charts_chart($settings['basic']['provider'], $settings)
@@ -28,11 +55,11 @@ function _charts_settings() {
   }
 
   // Basic info:
-  //   - Provider: which is the Chart API that will be used, like Google,
-  //               Open Flash Chart, FusionCharts...
-  //   - Type:     there are dozen types of charts, like 'Line', 'Bar',
-  //               'Scatter Plot', 'Pie'. And for each version, it can
-  //               be in 3D or 2D, vertical or hotizontal.
+  //   - provider:    which is the Chart API that will be used, like Google,
+  //                  Open Flash Chart, FusionCharts...
+  //   - charttypes:  there are dozen types of charts, like 'Line', 'Bar',
+  //                  'Scatter Plot', 'Pie'. And for each version, it can
+  //                  be in 3D or 2D, vertical or hotizontal...
   $form['basic'] = array(
     '#type'           => 'fieldset',
     '#title'          => t('Basic'),
@@ -47,7 +74,7 @@ function _charts_settings() {
     '#type'           => 'select',
     '#title'          => t('Chart provider'),
   );
-  $options = module_invoke_all('chartsinfo', 'charttypes');
+  $options = _charts_module_invoke_all('chartsinfo', 'charttypes');
   $form['basic']['charttype'] = array(
     '#default_value'  => empty($settings['basic']['charttype']) ? '' : $settings['basic']['charttype'],
     '#options'        => $options,
