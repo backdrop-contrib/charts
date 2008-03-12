@@ -39,5 +39,44 @@ function fusioncharts_chartsinfo($op) {
  *   Array. The
  */
 function fusioncharts_chartsapi(&$data) {
-  return 'TESTING';
+  // Include the specific Google Chart API helper functions
+  include_once drupal_get_path('module', 'fusioncharts') .'/fusioncharts.inc';
+
+  // Convert the chat TYPE into the FusionCharts way.
+  // Since its a requirement to build the chart on Google, if the value
+  // was not found, return nothing and stop the execution.
+  $options = array(
+    'line2D'  => '/Charts/MSCombi2D.swf',
+  );
+  if (empty($options[$data['basic']['charttype']])) {
+    return '';
+  }
+  $swf = url(drupal_get_path('module', 'fusioncharts') . $options[$data['basic']['charttype']]);
+
+  // Convert the chat SIZE into the FusionCharts way.
+  // Since its a requirement to build the chart on Google, if the value
+  // was not found, return nothing and stop the execution.
+  if (empty($data['layout']['width']) or empty($data['layout']['height'])) {
+    return '';
+  }
+  $width  = $data['layout']['width'];
+  $height = $data['layout']['height'];
+
+  // Convert the chat DATA into the FusionCharts way.
+  // Since its a requirement to build the chart on Google, if the value
+  // was not found, return nothing and stop the execution.
+  foreach ($data['data'] as $series) {
+    $xml['value'][] = _fusioncharts_values('set', $series);
+  }
+  $xml =  'dataXML='. _fusioncharts_xml_elements(array($xml));
+
+  // Its the HTML tag to include the chart
+  return <<<FUSIONCHARTS
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="$width" height="$height">
+  <param name="allowScriptAccess" value="always" />
+  <param name="FlashVars" value="$xml" />
+  <param name="quality" value="high" />
+  <embed src="$swf" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+</object>
+FUSIONCHARTS;
 }
