@@ -32,6 +32,35 @@ function _charts_module_invoke_all() {
 }
 
 /**
+ * Even if the series have values with attributes,
+ * return only the numeric values of them.
+ *
+ * @param
+ *   Array. A given data series with or without attributes.
+ * @return
+ *   Array. A data series, but only with the values, without
+ *   the attributes.
+ */
+function _charts_series_values($series) {
+  $data = array();
+
+  foreach ($series as $index => $value) {
+    if (!is_numeric($index)) {
+      continue;
+    }
+
+    if (is_array($value)) {
+      $data[] = $value['#value'];
+    }
+    else {
+      $data[] = $value;
+    }
+  }
+
+  return $data;
+}
+
+/**
  * Module settings page. Users can set the default layout
  * of their charts.
  *
@@ -45,67 +74,57 @@ function _charts_settings() {
   if (!empty($settings)) {
     // Since the chart is an example, we should provide
     // and example data.
-    $settings['data'] = array(
-      array(10, 20, 55, 72, 35, 23)
+    $settings[] = array(
+      10, 20, 55, 72, 45, 50
+    );
+    $settings[] = array(
+      '#label'      => 'Profit',
+      '#color'      => '#ff0000',
+      array('#value' => 35, '#label' => t('Jan')),
+      array('#value' => 25, '#label' => t('Feb')),
+      array('#value' => 75, '#label' => t('Mar')),
+      array('#value' => 50, '#label' => t('Apr')),
+      array('#value' => 23, '#label' => t('May')),
+      array('#value' => 12, '#label' => t('Jun')),
     );
 
+    // The testing chart needs a testing Title
+    $settings['#title'] = 'Testing Chart';
+
     $form['chart'] = array(
-      '#value'          => charts_chart($settings['basic']['provider'], $settings)
+      '#value'          => charts_chart($settings['#plugin'], $settings)
     );
   }
 
-  // Basic info:
-  //   - provider:    which is the Chart API that will be used, like Google,
-  //                  Open Flash Chart, FusionCharts...
-  //   - charttypes:  there are dozen types of charts, like 'Line', 'Bar',
-  //                  'Scatter Plot', 'Pie'. And for each version, it can
-  //                  be in 3D or 2D, vertical or hotizontal...
-  $form['basic'] = array(
-    '#type'           => 'fieldset',
-    '#title'          => t('Basic'),
-    '#collapsible'    => TRUE,
-    '#collapsed'      => FALSE,
-    '#tree'           => TRUE
-  );
   $options = module_invoke_all('chartsinfo', 'list');
-  $form['basic']['provider'] = array(
-    '#default_value'  => empty($settings['basic']['provider']) ? '' : $settings['basic']['provider'],
+  $form['plugin'] = array(
+    '#default_value'  => empty($settings['#plugin']) ? '' : $settings['#plugin'],
     '#options'        => $options,
     '#type'           => 'select',
-    '#title'          => t('Chart provider'),
+    '#title'          => t('Chart plugin'),
   );
   $options = _charts_module_invoke_all('chartsinfo', 'charttypes');
-  $form['basic']['charttype'] = array(
-    '#default_value'  => empty($settings['basic']['charttype']) ? '' : $settings['basic']['charttype'],
+  $form['type'] = array(
+    '#default_value'  => empty($settings['#type']) ? '' : $settings['#type'],
     '#options'        => $options,
     '#type'           => 'select',
     '#title'          => t('Chart type'),
   );
 
-  // Hold all layout settings, so independently from the Chart provider,
-  // the Charts will always look almost the same:
-  //   - Background Color: It can
-  $form['layout'] = array(
-    '#type'           => 'fieldset',
-    '#title'          => t('Layout'),
-    '#collapsible'    => TRUE,
-    '#collapsed'      => FALSE,
-    '#tree'           => TRUE
-  );
-  $form['layout']['background_color'] = array(
-    '#default_value'  => empty($settings['layout']['background_color']) ? 'ffffff' : $settings['layout']['background_color'],
+  $form['color'] = array(
+    '#default_value'  => empty($settings['#color']) ? 'ffffff' : $settings['#color'],
     '#description'    => t('Use the hexadecimal RGB value'),
     '#type'           => 'textfield',
     '#title'          => t('Background Color'),
   );
-  $form['layout']['width'] = array(
-    '#default_value'  => empty($settings['layout']['width']) ? 400 : $settings['layout']['width'],
+  $form['width'] = array(
+    '#default_value'  => empty($settings['#width']) ? 400 : $settings['#width'],
     '#description'    => t('The chart width, in pixels'),
     '#type'           => 'textfield',
     '#title'          => t('Width'),
   );
-  $form['layout']['height'] = array(
-    '#default_value'  => empty($settings['layout']['height']) ? 200 : $settings['layout']['height'],
+  $form['height'] = array(
+    '#default_value'  => empty($settings['#height']) ? 200 : $settings['#height'],
     '#description'    => t('The chart height, in pixels'),
     '#type'           => 'textfield',
     '#title'          => t('Height'),
@@ -126,9 +145,17 @@ function _charts_settings() {
  * @ingroup form
  */
 function _charts_settings_submit(&$form, &$form_state) {
-  // Build the chart settings
-  $settings['basic']  = $form_state['values']['basic'];
-  $settings['layout'] = $form_state['values']['layout'];
+  $settings = $form_state['values'];
+  unset($settings['submit']);
+  unset($settings['form_id']);
+  unset($settings['form_build_id']);
+  unset($settings['form_token']);
+
+  // Add a '#' in all field names
+  foreach ($settings as $index => $value) {
+    $settings["#$index"] = $value;
+    unset($settings[$index]);
+  }
 
   // Save the data into database
   variable_set('charts_settings', $settings);
@@ -163,3 +190,4 @@ function _charts_testing() {
   );
   return $form;
 }
+
