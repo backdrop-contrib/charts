@@ -87,22 +87,41 @@ function _google_charts_series(&$chart, &$data) {
     }
 
     // Get only the numeric values from the series
-    $series = _charts_series_values($data[$series]);
+    $series_data = _charts_series_values($data[$series]);
 
     // Get the highest value on the series, to be a reference point
-    $max = max($series);
+    $max = max($series_data);
 
     // For each series of data, scan it
-    foreach (element_children($series) as $value) {
-        $chart_data .= _google_charts_data_codingsimple($series[$value], $max);
+    foreach ($series_data as $value) {
+        $chart_data .= _google_charts_data_codingsimple($value, $max);
     }
+
+    // Series legends
+    $legends[] = empty($data[$series]['#legend']) ? '' : $data[$series]['#legend'];
+
+    // Series colors
+    $colors[] = empty($data[$series]['#color']) ? '' : $data[$series]['#color'];
   }
 
   // Return the series of data
   if (empty($chart_data)) {
     return FALSE;
   }
+
+   // Insert data
   $chart[] = 'chd=s:'. $chart_data;
+
+  // Insert series legend
+  if (!empty($legends)) {
+    $chart[] = 'chdl='. implode('|', $legends);
+  }
+
+  // Insert series legend
+  if (!empty($colors)) {
+    $chart[] = 'chco='. implode(',', $colors);
+  }
+
   return TRUE;
 }
 
