@@ -71,32 +71,28 @@ function _charts_settings() {
   $settings = variable_get('charts_settings', array());
 
   // This will hold the example chart
-  if (!empty($settings)) {
-    // Since the chart is an example, we should provide
-    // and example data.
-    $settings[] = array(
-      '#legend'     => 'Revenue',
-      '#color'      => '00ff00',
-      10, 20, 55, 72, 45, 50
-    );
-    $settings[] = array(
-      '#legend'     => 'Profit',
-      '#color'      => 'ff0000',
-      array('#value' => 35, '#label' => t('Jan')),
-      array('#value' => 25, '#label' => t('Feb')),
-      array('#value' => 75, '#label' => t('Mar')),
-      array('#value' => 50, '#label' => t('Apr')),
-      array('#value' => 23, '#label' => t('May')),
-      array('#value' => 12, '#label' => t('Jun')),
-    );
+  // Since the chart is an example, we should provide
+  // and example data.
+  $data[] = array(
+    '#legend'     => 'Profit',
+    array('#value' => 35, '#label' => t('Jan')),
+    array('#value' => 25, '#label' => t('Feb')),
+    array('#value' => 75, '#label' => t('Mar')),
+    array('#value' => 50, '#label' => t('Apr')),
+    array('#value' => 23, '#label' => t('May')),
+    array('#value' => 12, '#label' => t('Jun')),
+  );
+  $data[] = array(
+    '#legend'     => 'Revenue',
+    10, 20, 55, 72, 45, 50
+  );
 
-    // The testing chart needs a testing Title
-    $settings['#title'] = 'Testing Chart';
+  // The testing chart needs a testing Title
+  $data['#title'] = 'Testing Chart';
 
-    $form['chart'] = array(
-      '#value'          => charts_chart($settings['#plugin'], $settings)
-    );
-  }
+  $form['chart'] = array(
+    '#value'          => charts_chart($settings['#plugin'], $data)
+  );
 
   $options = module_invoke_all('chartsinfo', 'list');
   $form['plugin'] = array(
@@ -152,6 +148,7 @@ function _charts_settings_submit(&$form, &$form_state) {
   unset($settings['form_id']);
   unset($settings['form_build_id']);
   unset($settings['form_token']);
+  unset($settings['op']);
 
   // Add a '#' in all field names
   foreach ($settings as $index => $value) {
