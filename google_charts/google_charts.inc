@@ -93,15 +93,17 @@ function _google_charts_series(&$chart, &$data) {
     $max = max($series_data);
 
     // For each series of data, scan it
-    foreach ($series_data as $value) {
-        $chart_data .= _google_charts_data_codingsimple($value, $max);
+    foreach (array_keys($series_data) as $value) {
+      $chart_data .= _google_charts_data_codingsimple($series_data[$value], $max);
+
+      $value_labels[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
     }
 
     // Series legends
-    $legends[] = empty($data[$series]['#legend']) ? '' : $data[$series]['#legend'];
+    $legends[] = empty($data[$series]['#legend']) ? NULL : $data[$series]['#legend'];
 
     // Series colors
-    $colors[] = empty($data[$series]['#color']) ? '' : $data[$series]['#color'];
+    $colors[] = empty($data[$series]['#color']) ? NULL : $data[$series]['#color'];
   }
 
   // Return the series of data
@@ -113,13 +115,21 @@ function _google_charts_series(&$chart, &$data) {
   $chart[] = 'chd=s:'. $chart_data;
 
   // Insert series legend
-  if (!empty($legends)) {
-    $chart[] = 'chdl='. implode('|', $legends);
+  $legends = implode('|', $legends);
+  if (str_replace('|', '', $legends)) {
+    $chart[] = 'chdl='. $legends;
   }
 
   // Insert series legend
-  if (!empty($colors)) {
-    $chart[] = 'chco='. implode(',', $colors);
+  $colors = implode(',', $colors);
+  if (str_replace(',', '', $value_labels)) {
+    $chart[] = 'chco='. $colors;
+  }
+
+  // Insert values legend
+  $value_labels = implode('|', $value_labels);
+  if (str_replace('|', '', $value_labels)) {
+    $chart[] = 'chl='. $value_labels;
   }
 
   return TRUE;
