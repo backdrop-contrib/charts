@@ -23,6 +23,21 @@
  *   JavaScript external files)
  */
 function charts_chart($chart_provider, &$data) {
+  // Get the previously saved data from Data Base
+  $settings = variable_get('charts_settings', array());
+
+  // Merge all series option to the main data array,
+  // like color
+  foreach (element_children($settings) as $series) {
+    if (!empty($data[$series])) {
+      $data[$series] = array_merge($settings[$series], $data[$series]);
+    }
+    unset($settings[$series]);
+  }
+
+  // Now, merge all the rest of the options saved by default
+  $data = $settings + $data;
+
   $chart_provider = $chart_provider .'_chartsapi';
   if (function_exists($chart_provider)) {
     return $chart_provider($data);
