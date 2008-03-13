@@ -75,11 +75,13 @@ function _charts_settings() {
     // Since the chart is an example, we should provide
     // and example data.
     $settings[] = array(
+      '#legend'     => 'Revenue',
+      '#color'      => '00ff00',
       10, 20, 55, 72, 45, 50
     );
     $settings[] = array(
-      '#label'      => 'Profit',
-      '#color'      => '#ff0000',
+      '#legend'     => 'Profit',
+      '#color'      => 'ff0000',
       array('#value' => 35, '#label' => t('Jan')),
       array('#value' => 25, '#label' => t('Feb')),
       array('#value' => 75, '#label' => t('Mar')),
@@ -163,31 +165,3 @@ function _charts_settings_submit(&$form, &$form_state) {
   // Print a 'OK' message
   drupal_set_message('Settings saved');
 }
-
-/**
- * Module testing page. Users will be able to test a given
- * data to see what its going to look like.
- *
- * @ingroup form
- */
-function _charts_testing() {
-  // Get the previously saved data from Data Base
-  $settings = variable_get('charts_settings', array());
-
-  // This will hold the example chart
-  if (!empty($settings)) {
-    $form['chart'] = array(
-      '#value'          => charts_chart($settings['basic']['provider'], $data)
-    );
-  }
-
-  $form['data'] = array(
-    '#type'          => 'fieldset',
-    '#title'         => t('Data'),
-    '#collapsible'   => TRUE,
-    '#collapsed'     => FALSE,
-    '#tree'          => TRUE
-  );
-  return $form;
-}
-
