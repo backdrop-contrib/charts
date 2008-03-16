@@ -86,10 +86,7 @@ function _charts_settings() {
     '#legend'     => 'Revenue',
     10, 20, 55, 72, 45, 50
   );
-
-  // The testing chart needs a testing Title
   $data['#title'] = 'Testing Chart';
-
   $form['chart'] = array(
     '#value'          => charts_chart($settings['#plugin'], $data)
   );
@@ -128,6 +125,36 @@ function _charts_settings() {
     '#title'          => t('Height'),
   );
 
+  // Color for the first 4 series.
+  $form[0]['#tree'] = TRUE;
+  $form[0]['color'] = array(
+    '#default_value'  => empty($settings[0]['#color']) ? 'ff0000' : $settings[0]['#color'],
+    '#description'    => t('Use the hexadecimal RGB value'),
+    '#type'           => 'textfield',
+    '#title'          => t('Series 1 Color'),
+  );
+  $form[1]['#tree'] = TRUE;
+  $form[1]['color'] = array(
+    '#default_value'  => empty($settings[1]['#color']) ? '00ff00' : $settings[1]['#color'],
+    '#description'    => t('Use the hexadecimal RGB value'),
+    '#type'           => 'textfield',
+    '#title'          => t('Series 2 Color'),
+  );
+  $form[2]['#tree'] = TRUE;
+  $form[2]['color'] = array(
+    '#default_value'  => empty($settings[2]['#color']) ? '0000ff' : $settings[2]['#color'],
+    '#description'    => t('Use the hexadecimal RGB value'),
+    '#type'           => 'textfield',
+    '#title'          => t('Series 3 Color'),
+  );
+  $form[3]['#tree'] = TRUE;
+  $form[3]['color'] = array(
+    '#default_value'  => empty($settings[3]['#color']) ? '000000' : $settings[3]['#color'],
+    '#description'    => t('Use the hexadecimal RGB value'),
+    '#type'           => 'textfield',
+    '#title'          => t('Series 4 Color'),
+  );
+
   $form['submit'] = array(
     '#type'           => 'submit',
     '#value'          => t('Save settings'),
@@ -152,8 +179,16 @@ function _charts_settings_submit(&$form, &$form_state) {
 
   // Add a '#' in all field names
   foreach ($settings as $index => $value) {
-    $settings["#$index"] = $value;
-    unset($settings[$index]);
+    if (!is_numeric($index)) {
+      $settings["#$index"] = $value;
+      unset($settings[$index]);
+    }
+    else {
+      foreach ($value as $index2 => $value2) {
+        $settings[$index]["#$index2"] = $value2;
+        unset($settings[$index][$index2]);
+      }
+    }
   }
 
   // Save the data into database
