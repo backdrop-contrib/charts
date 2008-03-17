@@ -46,23 +46,24 @@ function charts_chart(&$data) {
  */
 function charts_menu() {
   $items['admin/settings/charts'] = array(
+    'description'     => 'Set the default behaviour and look of all your charts',
     'file'            => 'charts.inc',
     'page callback'   => 'drupal_get_form',
     'page arguments'  => array('_charts_settings'),
     'title'           => 'Charts'
   );
-  $items['admin/settings/charts/settings'] = array(
-    'page arguments'  => array('_charts_settings'),
-    'title'           => 'Settings',
-    'type'            => MENU_DEFAULT_LOCAL_TASK,
-  );
-  $items['admin/settings/charts/testing'] = array(
-    'file'            => 'charts.inc',
-    'page callback'   => 'drupal_get_form',
-    'page arguments'  => array('_charts_testing'),
-    'title'           => 'Testing',
-    'type'            => MENU_LOCAL_TASK,
-  );
+//   $items['admin/settings/charts/settings'] = array(
+//     'page arguments'  => array('_charts_settings'),
+//     'title'           => 'Settings',
+//     'type'            => MENU_DEFAULT_LOCAL_TASK,
+//   );
+//   $items['admin/settings/charts/testing'] = array(
+//     'file'            => 'charts.inc',
+//     'page callback'   => 'drupal_get_form',
+//     'page arguments'  => array('_charts_testing'),
+//     'title'           => 'Testing',
+//     'type'            => MENU_LOCAL_TASK,
+//   );
   return $items;
 }
 
