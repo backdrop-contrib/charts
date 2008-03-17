@@ -7,9 +7,9 @@
  */
 
 /**
- * Page callback.
+ * Chart reports page
  */
-function _charts_system_charts($ctype = 'nodes') {
+function _charts_system_charts($ctype) {
   $output = '';
 
   switch ($ctype) {
@@ -37,6 +37,7 @@ function _charts_system_charts($ctype = 'nodes') {
         GROUP BY type
         ORDER BY type"
       );
+      $output .= _charts_system_node_activity();
       break;
 
     case 'users':
@@ -83,7 +84,7 @@ function _charts_system_charts($ctype = 'nodes') {
 }
 
 /**
- * Translate the user status label code to a string
+ * Generate some charts using a pre defined method.
  *
  * @param $title
  *   String. The chart title
@@ -116,6 +117,55 @@ function _charts_system_generate($title, $sql, $callback = NULL) {
     $chart[0] = $data;
     $chart['#title']    = $title;
     $chart['#type']     = 'pie2D';
+
+    return charts_chart($chart);
+  }
+
+  return '';
+}
+
+/**
+ * Show which kind of node type was created in the current month.
+ *
+ * @return
+ *   String. The HTML chart when all data is fine or a blank string
+ */
+function _charts_system_node_activity() {
+  $now   = time();
+
+  $results = db_query('SELECT type, created
+    FROM {node}
+    WHERE created < %d AND created > %d
+    ORDER BY created',
+    $now, mktime(0, 0, 0, date('m', $now), 1, date('Y', $now))
+  );
+
+  $max    = array();
+  $counts = array();
+  $types  = array();
+
+  while ($result = db_fetch_array($results)) {
+    $day = ltrim(date('d', $result['created']), '0');
+    $types[] = $result['type'];
+    $counts[$day][$result['type']]++;
+  }
+
+  // Generate data and labels
+  if (!empty($counts)) {
+    for ($i = 1; $i <= date('d', $now); $i++) {
+      foreach ($types as $index => $type) {
+        $chart[$index]['#legend'] = $type;
+        $chart[$index][] = array(
+          '#value'  => empty($counts[$i][$type]) ? 0 : $counts[$i][$type],
+          '#label'  => empty($index) ? $i : NULL
+        );
+      }
+    }
+  }
+
+  if (!empty($chart)) {
+    $chart['#title']    = t('Activity for !date', array('!date' => date('F Y', $now)));
+    $chart['#type']     = 'line2D';
 
     return charts_chart($chart);
   }
