@@ -99,6 +99,8 @@ function _google_charts_series(&$chart, &$data) {
   // The final output is going to be build
   $chart_data = '';
 
+  $value_labels = array();
+
   // For each chart value, encode it
   // Note: Underscore represents a missing value
   foreach (element_children($data) as $series) {
@@ -113,11 +115,19 @@ function _google_charts_series(&$chart, &$data) {
     // Get the highest value on the series, to be a reference point
     $max = max($series_data);
 
+    // Value labels: temporary array.
+    $value_labels_temp = array();
+
     // For each series of data, scan it
     foreach (array_keys($series_data) as $value) {
       $chart_data .= _google_charts_data_codingsimple($series_data[$value], $max);
 
-      $value_labels[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
+      $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
+    }
+
+    // Value labels
+    if (!empty($value_labels_temp)) {
+      $value_labels += $value_labels_temp;
     }
 
     // Series legends
