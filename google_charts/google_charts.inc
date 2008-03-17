@@ -7,33 +7,15 @@
  */
 
 /**
- * Encode the Chart data into a Alphanumeric code, follwing the
- * Google Chart API instruction. Its needed because there is a
- * size limmit to URL strings. So we reduce the amount of characters.
+ * Convert all Chart-level data.
  *
- * It basicly uses a scale of 61 levels to represent each chart
- * value. If a more precise scale is needed, see
- * _google_charts_codingextended(), which produces a 4000 levels,
- * but also a bigger URL string.
- *
- * @param $data
- *   Array. A series of numeric data values
+ * @param &$chart
+ *   Array. The array that will be converted into a string for Google Charts
+ * @param &$data
+ *   Array. The raw data.
  * @return
  *   String. The string presentation of series data
  */
-function _google_charts_data_codingsimple($value, $max) {
-  // Set the list of characters and the size of the list
-  $simple = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  $simple_len = strlen($simple) - 1;
-
-  if ($value >= 0) {
-    return $simple[round($simple_len * $value / $max)];
-  }
-  else {
-    return  '_';
-  }
-}
-
 function _google_charts_chart(&$chart, &$data) {
   // Convert the chat TYPE into the Google Chart way.
   // Since its a requirement to build the chart on Google, if the value
@@ -74,6 +56,44 @@ function _google_charts_chart(&$chart, &$data) {
   return TRUE;
 }
 
+/**
+ * Encode the Chart data into a Alphanumeric code, follwing the
+ * Google Chart API instruction. Its needed because there is a
+ * size limmit to URL strings. So we reduce the amount of characters.
+ *
+ * It basicly uses a scale of 61 levels to represent each chart
+ * value. If a more precise scale is needed, see
+ * _google_charts_codingextended(), which produces a 4000 levels,
+ * but also a bigger URL string.
+ *
+ * @param $data
+ *   Array. A series of numeric data values
+ * @return
+ *   String. The string presentation of series data
+ */
+function _google_charts_data_codingsimple($value, $max) {
+  // Set the list of characters and the size of the list
+  $simple = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  $simple_len = strlen($simple) - 1;
+
+  if ($value >= 0) {
+    return $simple[round($simple_len * $value / $max)];
+  }
+  else {
+    return  '_';
+  }
+}
+
+/**
+ * Convert all Series-level data.
+ *
+ * @param &$chart
+ *   Array. The array that will be converted into a string for Google Charts
+ * @param &$data
+ *   Array. The raw data.
+ * @return
+ *   String. The string presentation of series data
+ */
 function _google_charts_series(&$chart, &$data) {
   // The final output is going to be build
   $chart_data = '';
@@ -133,7 +153,4 @@ function _google_charts_series(&$chart, &$data) {
   }
 
   return TRUE;
-}
-
-function _google_charts_values() {
 }
