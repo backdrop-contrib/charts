@@ -46,15 +46,15 @@ function google_charts_chartsapi(&$data) {
   include_once drupal_get_path('module', 'google_charts') .'/google_charts.inc';
 
   $chart = array();
-  if (!_google_charts_chart($chart, $data)) {
-    return '';
+  if ($message = _google_charts_chart($chart, $data)) {
+    return $message;
   }
 
   // Convert the chat DATA into the Google Chart way.
   // Since its a requirement to build the chart on Google, if the value
   // was not found, return nothing and stop the execution.
-  if (!_google_charts_series($chart, $data)) {
-    return '';
+  if ($message = _google_charts_series($chart, $data)) {
+    return $message;
   }
 
   // If its all ok, build the HTML img tag

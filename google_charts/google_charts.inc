@@ -30,7 +30,8 @@ function _google_charts_chart(&$chart, &$data) {
     'scatter' => 's',
   );
   if (empty($options[$data['#type']])) {
-    return FALSE;
+    return t('This type is not possible using %chartplugin',
+      array('%chartplugin' => 'Google Chart'));
   }
   $chart[] = 'cht='. $options[$data['#type']];
 
@@ -38,7 +39,7 @@ function _google_charts_chart(&$chart, &$data) {
   // Since its a requirement to build the chart on Google, if the value
   // was not found, return nothing and stop the execution.
   if (empty($data['#width']) or empty($data['#height'])) {
-    return FALSE;
+    return t('Height and Width are required');
   }
   $chart[] = 'chs='. $data['#width'] .'x'. $data['#height'];
 
@@ -53,7 +54,7 @@ function _google_charts_chart(&$chart, &$data) {
     $chart[] = 'chf=bg,s,'. $data['#color'];
   }
 
-  return TRUE;
+  return;
 }
 
 /**
@@ -128,7 +129,7 @@ function _google_charts_series(&$chart, &$data) {
 
   // Return the series of data
   if (empty($chart_data)) {
-    return FALSE;
+    return t('No enough data to create a chart.');
   }
 
    // Insert data
@@ -152,5 +153,5 @@ function _google_charts_series(&$chart, &$data) {
     $chart[] = 'chl='. $value_labels;
   }
 
-  return TRUE;
+  return;
 }
