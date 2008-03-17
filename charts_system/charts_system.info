@@ -1,0 +1,5 @@
+; $Id$
+core            = "6.x"
+dependencies[]  = charts
+description     = "Use Charts for Drupal administration"
+name            = "Charts System"
