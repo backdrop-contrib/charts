@@ -32,35 +32,6 @@ function _charts_module_invoke_all() {
 }
 
 /**
- * Even if the series have values with attributes,
- * return only the numeric values of them.
- *
- * @param
- *   Array. A given data series with or without attributes.
- * @return
- *   Array. A data series, but only with the values, without
- *   the attributes.
- */
-function _charts_series_values($series) {
-  $data = array();
-
-  foreach ($series as $index => $value) {
-    if (!is_numeric($index)) {
-      continue;
-    }
-
-    if (is_array($value)) {
-      $data[] = $value['#value'];
-    }
-    else {
-      $data[] = $value;
-    }
-  }
-
-  return $data;
-}
-
-/**
  * Module settings page. Users can set the default layout
  * of their charts.
  *
@@ -88,7 +59,7 @@ function _charts_settings() {
   );
   $data['#title'] = 'Testing Chart';
   $form['chart'] = array(
-    '#value'          => charts_chart($settings['#plugin'], $data)
+    '#value'          => charts_chart($data)
   );
 
   $options = module_invoke_all('chartsinfo', 'list');

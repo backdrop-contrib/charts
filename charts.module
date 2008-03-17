@@ -13,16 +13,13 @@
  * The main Chart API function, that calls any chart provider
  * to print the given data.
  *
- * @param $chart_provider
- *   String. The chart provider code. With this module you might install
- *   'google_charts', 'openflashchart' and 'fusioncharts'
  * @param &$data
  *   Array. The chart data, described on chart_api.txt
  * @return
  *   String. The HTML with the propper chart (might include Flash or
  *   JavaScript external files)
  */
-function charts_chart($chart_provider, &$data) {
+function charts_chart(&$data) {
   // Get the previously saved data from Data Base
   $settings = variable_get('charts_settings', array());
 
@@ -36,9 +33,9 @@ function charts_chart($chart_provider, &$data) {
   }
 
   // Now, merge all the rest of the options saved by default
-  $data = $settings + $data;
+  $data = array_merge($settings, $data);
 
-  $chart_provider = $chart_provider .'_chartsapi';
+  $chart_provider = $data['#plugin'] .'_chartsapi';
   if (function_exists($chart_provider)) {
     return $chart_provider($data);
   }
@@ -81,4 +78,33 @@ function charts_requirements($phase) {
 
     return $requirements;
   }
+}
+
+/**
+ * Even if the series have values with attributes,
+ * return only the numeric values of them.
+ *
+ * @param
+ *   Array. A given data series with or without attributes.
+ * @return
+ *   Array. A data series, but only with the values, without
+ *   the attributes.
+ */
+function _charts_series_values($series) {
+  $data = array();
+
+  foreach ($series as $index => $value) {
+    if (!is_numeric($index)) {
+      continue;
+    }
+
+    if (is_array($value)) {
+      $data[] = $value['#value'];
+    }
+    else {
+      $data[] = $value;
+    }
+  }
+
+  return $data;
 }
