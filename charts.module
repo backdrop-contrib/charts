@@ -23,13 +23,42 @@ function charts_chart(&$data) {
   // Get the previously saved data from Data Base
   $settings = variable_get('charts_settings', array());
 
+  $options = array('pie2D' => TRUE, 'pie3D' => TRUE);
+  if (!empty($data['#type'])) {
+    if (!empty($options[$data['#type']])) {
+      $color_palette = TRUE;
+    }
+  }
+  elseif (!empty($settings['#type'])) {
+    if (!empty($options[$settings['#type']])) {
+      $color_palette = TRUE;
+    }
+  }
+
   // Merge all series option to the main data array,
-  // like color
-  foreach (element_children($settings) as $series) {
-    if (!empty($data[$series])) {
+  foreach (element_children($data) as $series) {
+    if (!empty($settings[$series])) {
       $data[$series] = array_merge($settings[$series], $data[$series]);
     }
     unset($settings[$series]);
+
+    // Color Palette
+    if (empty($color_palette) and empty($data[$series]['#color'])) {
+      $data[$series]['#color'] = trim($settings['#color_palette'][$series]);
+    }
+    elseif (!empty($color_palette)) {
+      foreach (element_children($data[$series]) as $values) {
+        if (!is_array($data[$series][$values])) {
+          $data[$series][$values] = array(
+            '#value' => $data[$series][$values],
+            '#color' => trim($settings['#color_palette'][$values])
+          );
+        }
+        elseif (empty($data[$series][$values]['#color'])) {
+          $data[$series][$values]['#color'] = trim($settings['#color_palette'][$values]);
+        }
+      }
+    }
   }
 
   // Now, merge all the rest of the options saved by default
