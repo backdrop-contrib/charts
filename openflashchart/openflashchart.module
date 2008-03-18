@@ -23,8 +23,8 @@ function openflashchart_chartsinfo($op) {
     case 'charttypes':
       return array(
         'line2D'  => t('Line 2D'),
-        'hbar2D'  => t('Horizontal Bar 2D'),
         'vbar2D'  => t('Vertical Bar 2D'),
+        'vbar3D'  => t('Vertical Bar 3D'),
         'pie2D'   => t('Pie 2D'),
       );
   }
@@ -44,9 +44,13 @@ function openflashchart_chartsapi(&$data) {
 
   $chart = new open_flash_chart_api();
 
-  _openflashchart_chart($chart, $data);
+  if ($error = _openflashchart_chart($chart, $data)) {
+    return $error;
+  }
 
-  _openflashchart_series($chart, $data);
+  if ($error = _openflashchart_series($chart, $data)) {
+    return $error;
+  }
 
   return $chart->render();
 }
