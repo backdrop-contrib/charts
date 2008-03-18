@@ -70,6 +70,7 @@ function _charts_settings() {
     '#title'          => t('Chart plugin'),
   );
   $options = _charts_module_invoke_all('chartsinfo', 'charttypes');
+  asort($options);
   $form['type'] = array(
     '#default_value'  => empty($settings['#type']) ? '' : $settings['#type'],
     '#options'        => $options,
