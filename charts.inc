@@ -79,7 +79,7 @@ function _charts_settings() {
   );
 
   $form['color'] = array(
-    '#default_value'  => empty($settings['#color']) ? 'ffffff' : $settings['#color'],
+    '#default_value'  => empty($settings['#color']) ? 'FFFFFF' : $settings['#color'],
     '#description'    => t('Use the hexadecimal RGB value'),
     '#type'           => 'textfield',
     '#title'          => t('Background Color'),
@@ -97,34 +97,38 @@ function _charts_settings() {
     '#title'          => t('Height'),
   );
 
-  // Color for the first 4 series.
-  $form[0]['#tree'] = TRUE;
-  $form[0]['color'] = array(
-    '#default_value'  => empty($settings[0]['#color']) ? 'ff0000' : $settings[0]['#color'],
-    '#description'    => t('Use the hexadecimal RGB value'),
-    '#type'           => 'textfield',
-    '#title'          => t('Series 1 Color'),
-  );
-  $form[1]['#tree'] = TRUE;
-  $form[1]['color'] = array(
-    '#default_value'  => empty($settings[1]['#color']) ? '00ff00' : $settings[1]['#color'],
-    '#description'    => t('Use the hexadecimal RGB value'),
-    '#type'           => 'textfield',
-    '#title'          => t('Series 2 Color'),
-  );
-  $form[2]['#tree'] = TRUE;
-  $form[2]['color'] = array(
-    '#default_value'  => empty($settings[2]['#color']) ? '0000ff' : $settings[2]['#color'],
-    '#description'    => t('Use the hexadecimal RGB value'),
-    '#type'           => 'textfield',
-    '#title'          => t('Series 3 Color'),
-  );
-  $form[3]['#tree'] = TRUE;
-  $form[3]['color'] = array(
-    '#default_value'  => empty($settings[3]['#color']) ? '000000' : $settings[3]['#color'],
-    '#description'    => t('Use the hexadecimal RGB value'),
-    '#type'           => 'textfield',
-    '#title'          => t('Series 4 Color'),
+  // Color for the series.
+  $form['color_palette'] = array(
+    '#default_value'  => empty($settings[3]['#color_palette']) ?
+'FF8000
+FFC080
+FFDFBF
+FFC080
+FFCC00
+FFE500
+FFF9BF
+78C0E9
+179CE8
+30769E
+C8E9FC
+ECF8FF
+00CCFF
+4086AA
+91C3DC
+87907D
+AAB6A2
+555555
+666666
+21B6A8
+177F75
+B6212D
+7F171F
+B67721
+7F5417' :
+      $settings[3]['#color_palette'],
+    '#description'    => t('Used to differentiate series or pie-chart pieces. Use the hexadecimal RGB value'),
+    '#type'           => 'textarea',
+    '#title'          => t('Color Palete'),
   );
 
   $form['submit'] = array(
@@ -151,17 +155,11 @@ function _charts_settings_submit(&$form, &$form_state) {
 
   // Add a '#' in all field names
   foreach ($settings as $index => $value) {
-    if (!is_numeric($index)) {
-      $settings["#$index"] = $value;
-      unset($settings[$index]);
-    }
-    else {
-      foreach ($value as $index2 => $value2) {
-        $settings[$index]["#$index2"] = $value2;
-        unset($settings[$index][$index2]);
-      }
-    }
+    $settings["#$index"] = $value;
+    unset($settings[$index]);
   }
+
+  $settings['#color_palette'] = explode("\n", $settings['#color_palette']);
 
   // Save the data into database
   variable_set('charts_settings', $settings);
