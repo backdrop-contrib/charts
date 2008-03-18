@@ -15,12 +15,9 @@
  *   Array. The raw data.
  */
 function _openflashchart_chart(&$chart, &$data) {
-  $chart->set_title($data['#title'], '{font-size: 20px;}' );
+  $chart->set_title($data['#title']);
   $chart->set_width($data['#width']);
   $chart->set_height($data['#height']);
-
-  $chart->bar(10, '#9933CC', '#8010A0', 'Page views', 10);
-
   $chart->set_bg_colour($data['#color']);
 }
 
@@ -34,16 +31,93 @@ function _openflashchart_chart(&$chart, &$data) {
  */
 function _openflashchart_series(&$chart, &$data) {
   foreach (element_children($data) as $series) {
-    // Get only the numeric values from the series
-    $series_data = _charts_series_values($data[$series]);
+    // Get the color
+    $color = empty($data[$series]['#color']) ? '' : $data[$series]['#color'];
 
-    // Get the highest value on the series, to be a reference point
-    $max = $max < max($series_data) ? max($series_data) : $max;
+    switch ($data['#type']) {
+      case 'line2D':
+        $chart->line(1, $color);
+        break;
 
-    $chart->set_data($series_data);
+      case 'vbar2D':
+        $chart->bar(100, $color);
+        break;
+
+      case 'vbar3D':
+        $chart->bar_3D(100, $color);
+        break;
+
+      case 'pie2D':
+        $chart->pie(100, '#000000', '');
+        break;
+
+      default:
+        return t('This type is not possible using %chartplugin',
+          array('%chartplugin' => 'Open Flash Chart'));
+    }
+
+    // Insert a new series of values
+    if ($data['#type'] != 'pie2D') {
+      _openflashchart_series_generic(&$chart, &$data, $series);
+    }
+    elseif (empty($series)) {
+      _openflashchart_series_pie(&$chart, &$data, $series);
+    }
   }
+}
 
-  $chart->set_y_max( $max );
+function _openflashchart_series_generic(&$chart, &$data, $series) {
+  static $max;
 
-//   $chart->set_x_labels();
+  // Get only the numeric values from the series
+  $series_data = _charts_series_values($data[$series]);
+
+  $chart->set_data($series_data);
+
+  // Get the highest value on the series, to be a reference point
+  $max = $max < max($series_data) ? max($series_data) : $max;
+
+  // Y labels
+  $chart->set_y_max($max);
+
+  // X labels
+  $value_labels = array();
+  $toogle = FALSE;
+  foreach (array_keys($series_data) as $value) {
+    if (empty($data[$series][$value]['#label'])) {
+      $value_labels[] = '';
+    }
+    else {
+      $value_labels[] = $data[$series][$value]['#label'];
+      $toogle = TRUE;
+    }
+  }
+  if (!empty($toogle)) {
+    $chart->set_x_labels($value_labels);
+  }
+}
+
+function _openflashchart_series_pie(&$chart, &$data, $series) {
+  // Get only the numeric values from the series
+  $series_data = _charts_series_values($data[$series]);
+
+  if (empty($series)) {
+    // Pieces labels
+    $value_labels = array();
+    foreach (array_keys($series_data) as $value) {
+      if (empty($data[$series][$value]['#label'])) {
+        $value_labels[] = '';
+      }
+      else {
+        $value_labels[] = $data[$series][$value]['#label'];
+      }
+    }
+
+    $chart->pie_values($series_data, $value_labels, array());
+
+    foreach (element_children($data) as $series2) {
+      $color[] = $data[$series2]['#color'];
+    }
+    $chart->pie_slice_colours($color);
+  }
 }
