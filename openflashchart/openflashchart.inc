@@ -40,15 +40,15 @@ function _openflashchart_series(&$chart, &$data) {
         break;
 
       case 'vbar2D':
-        $chart->bar(100, $color);
+        $chart->bar(75, $color);
         break;
 
       case 'vbar3D':
-        $chart->bar_3D(100, $color);
+        $chart->bar_3D(75, $color);
         break;
 
       case 'pie2D':
-        $chart->pie(100, '#000000', '');
+        $chart->pie(75, '#000000', 'font-size: 12px;');
         break;
 
       default:
@@ -111,13 +111,12 @@ function _openflashchart_series_pie(&$chart, &$data, $series) {
       else {
         $value_labels[] = $data[$series][$value]['#label'];
       }
+
+      $color[] = $data[$series][$value]['#color'];
     }
 
     $chart->pie_values($series_data, $value_labels, array());
 
-    foreach (element_children($data) as $series2) {
-      $color[] = $data[$series2]['#color'];
-    }
     $chart->pie_slice_colours($color);
   }
 }
