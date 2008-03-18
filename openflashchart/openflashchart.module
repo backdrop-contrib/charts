@@ -39,5 +39,14 @@ function openflashchart_chartsinfo($op) {
  *   Array. The
  */
 function openflashchart_chartsapi(&$data) {
-  return 'TESTING';
+  // Include the specific Open Flash Chart helper functions
+  include_once drupal_get_path('module', 'openflashchart') .'/openflashchart.inc';
+
+  $chart = new open_flash_chart_api();
+
+  _openflashchart_chart($chart, $data);
+
+  _openflashchart_series($chart, $data);
+
+  return $chart->render();
 }
