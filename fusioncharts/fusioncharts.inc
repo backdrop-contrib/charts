@@ -114,3 +114,57 @@ function _fusioncharts_xml_elements($array) {
   }
   return $output;
 }
+
+/**
+ * Convert all Chart-level data.
+ *
+ * @param &$chart
+ *   Array. The array that will be converted into a string for FusionCharts
+ * @param &$data
+ *   Array. The raw data.
+ * @return
+ *   String. The string presentation of series data
+ */
+function _fusioncharts_chart(&$chart, &$data) {
+}
+
+/**
+ * Convert all Series-level data.
+ *
+ * @param &$chart
+ *   Array. The array that will be converted into a string for FusionCharts
+ * @param &$data
+ *   Array. The raw data.
+ * @return
+ *   String. The string presentation of series data
+ */
+function _fusioncharts_series(&$chart, &$data) {
+  // Convert the chat DATA into the FusionCharts way.
+  // Since its a requirement to build the chart on FusionCharts, if the value
+  // was not found, return nothing and stop the execution.
+  foreach (element_children($data) as $series) {
+    $series_data = _charts_series_values($data[$series]);
+
+    $chart['chart'][] = _fusioncharts_values('set', $series_data);
+
+    foreach (element_children($data[$series]) as $values) {
+      $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
+    }
+
+    // X labels
+    $value_labels = array();
+    $toogle = FALSE;
+    foreach (array_keys($series_data) as $value) {
+      if (empty($data[$series][$value]['#label'])) {
+        $value_labels[] = '';
+      }
+      else {
+        $value_labels[] = $data[$series][$value]['#label'];
+        $toogle = TRUE;
+      }
+    }
+    if (!empty($toogle)) {
+      $chart['chart'][] = _fusioncharts_values('category', $value_labels);
+    }
+  }
+}
