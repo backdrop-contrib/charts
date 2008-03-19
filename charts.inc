@@ -131,7 +131,7 @@ function _charts_settings() {
     '#default_value'  => implode(', ', $colors),
     '#description'    => t('Used to differentiate series or pie-chart pieces. Use the hexadecimal RGB value'),
     '#type'           => 'textarea',
-    '#title'          => t('Color Palete'),
+    '#title'          => t('Color Palette'),
   );
   $colors_example = '';
   foreach ($colors as $color) {
