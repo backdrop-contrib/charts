@@ -72,7 +72,10 @@ function fusioncharts_chartsapi(&$data) {
   $width  = $data['#width'];
   $height = $data['#height'];
 
-  $chart = array();
+  $chart = array(
+    'key'   => 'chart',
+    'value' => array()
+  );
 
   if ($message = _fusioncharts_chart($chart, $data)) {
     return $message;
@@ -86,7 +89,7 @@ function fusioncharts_chartsapi(&$data) {
     return $message;
   }
 
-  $chart =  '&dataXML='. str_replace('"', "'", format_xml_elements($chart));
+  $chart =  '&dataXML='. str_replace('"', "'", format_xml_elements(array($chart)));
 
   // Its the HTML tag to include the chart
   return <<<FUSIONCHARTS

@@ -54,8 +54,6 @@ function _fusioncharts_values($type, $data, $options = array()) {
     );
   }
   else {
-// z('--');
-// z($values);
     return $values;
   }
 }
@@ -71,6 +69,8 @@ function _fusioncharts_values($type, $data, $options = array()) {
  *   String. The string presentation of series data
  */
 function _fusioncharts_chart(&$chart, &$data) {
+  $chart['attributes']['bgColor'] = $data['#color'];
+  $chart['attributes']['caption'] = $data['#title'];
 }
 
 /**
@@ -88,9 +88,23 @@ function _fusioncharts_series(&$chart, &$data) {
   // Since its a requirement to build the chart on FusionCharts, if the value
   // was not found, return nothing and stop the execution.
   foreach (element_children($data) as $series) {
-    $series_data = _charts_series_values($data[$series]);
+    foreach (element_children($data[$series]) as $values) {
+      if (is_array($data[$series][$values])) {
+        $series_data[] = array(
+          'value' => $data[$series][$values]['#value'],
+          'label' => $data[$series][$values]['#label'],
+        );
+      }
+      else {
+        $series_data[] = array(
+          'value' => $data[$series][$values],
+        );
+      }
+    }
 
-    $chart['chart'][] = _fusioncharts_values('set', $series_data);
+    $options['color'] = trim($data['#color_palette'][$series]);
+
+    $chart['value'][] = _fusioncharts_values('set', $series_data, $options);
 
     foreach (element_children($data[$series]) as $values) {
       $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
@@ -109,7 +123,7 @@ function _fusioncharts_series(&$chart, &$data) {
       }
     }
     if (!empty($toogle)) {
-      $chart['chart'][] = _fusioncharts_values('category', $value_labels);
+      $chart['value'][] = _fusioncharts_values('category', $value_labels);
     }
   }
 }
@@ -141,6 +155,7 @@ function _fusioncharts_series_single(&$chart, &$data) {
         $series_data[] = array(
           'value' => $data[$series][$values]['#value'],
           'label' => $data[$series][$values]['#label'],
+          'color' => trim($data['#color_palette'][$series])
         );
       }
       else {
@@ -153,7 +168,7 @@ function _fusioncharts_series_single(&$chart, &$data) {
     $options['no_wrap'] = TRUE;
     $options['label'] = TRUE;
     foreach (_fusioncharts_values('set', $series_data, $options) as $set) {
-      $chart['chart'][] = $set;
+      $chart['value'][] = $set;
     }
 
     // X labels
@@ -169,7 +184,7 @@ function _fusioncharts_series_single(&$chart, &$data) {
       }
     }
     if (!empty($toogle)) {
-      $chart['chart'][] = _fusioncharts_values('category', $value_labels);
+      $chart['value'][] = _fusioncharts_values('category', $value_labels);
     }
   }
 }
