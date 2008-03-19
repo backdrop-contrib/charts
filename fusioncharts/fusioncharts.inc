@@ -56,66 +56,6 @@ function _fusioncharts_values($type, $data, $options = array()) {
 }
 
 /**
- * Format an attribute string to insert in a tag, but
- * instead envolve data into double quotes, like
- * drupal_attributes() function, it put data into
- * single quotes.
- *
- * @param $attributes
- *   An associative array of HTML attributes.
- * @return
- *   An HTML string ready for insertion in a tag.
- * @see drupal_attributes()
- */
-function _fusioncharts_xml_attributes($attributes = array()) {
-  if (is_array($attributes)) {
-    $t = '';
-    foreach ($attributes as $key => $value) {
-      $t .= " $key=".'\''. check_plain($value) .'\'';
-    }
-    return $t;
-  }
-}
-
-/**
- * Format XML elements.
- *
- * @param $array
- *   An array where each item represent an element and is either a:
- *   - (key => value) pair (<key>value</key>)
- *   - Associative array with fields:
- *     - 'key': element name
- *     - 'value': element contents
- *     - 'attributes': associative array of element attributes
- *
- * In both cases, 'value' can be a simple string, or it can be another array
- * with the same format as $array itself for nesting.
- */
-function _fusioncharts_xml_elements($array) {
-  foreach ($array as $key => $value) {
-    if (is_numeric($key)) {
-      if ($value['key']) {
-        $output .= ' <'. $value['key'];
-        if (isset($value['attributes']) && is_array($value['attributes'])) {
-          $output .= _fusioncharts_xml_attributes($value['attributes']);
-        }
-
-        if ($value['value'] != '') {
-          $output .= '>'. (is_array($value['value']) ? _fusioncharts_xml_elements($value['value']) : check_plain($value['value'])) .'</'. $value['key'] .">\n";
-        }
-        else {
-          $output .= " />";
-        }
-      }
-    }
-    else {
-      $output .= " <$key>". (is_array($value) ? _fusioncharts_xml_elements($value) : check_plain($value)) ."</$key>";
-    }
-  }
-  return $output;
-}
-
-/**
  * Convert all Chart-level data.
  *
  * @param &$chart
