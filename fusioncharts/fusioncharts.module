@@ -77,11 +77,11 @@ function fusioncharts_chartsapi(&$data) {
 
   // Its the HTML tag to include the chart
   return <<<FUSIONCHARTS
-<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="$width" height="$height">
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
   <param name="allowScriptAccess" value="always" />
   <param name="FlashVars" value="$chart" />
   <param name="quality" value="high" />
-  <embed src="$file" flashVars="$chart" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+  <embed src="$file" flashVars="$chart" width="$width" height="$height" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
 </object>
 FUSIONCHARTS;
 }
