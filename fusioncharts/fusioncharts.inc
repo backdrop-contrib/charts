@@ -20,15 +20,15 @@
  */
 function _fusioncharts_values($type, $data, $options = array()) {
   switch ($type) {
-    case 'category':
+    case 'categories':
       $attr         = 'label';
       $global_type  = 'categories';
     break;
-    case 'set':
+    case 'dataSet':
       $attr         = 'value';
       $global_type  = 'dataSet';
     break;
-    case 'trendline':
+    case 'trendlines':
       $attr         = 'value';
       $global_type  = 'trendlines';
     break;
@@ -85,7 +85,7 @@ function _fusioncharts_series(&$chart, &$data) {
   foreach (element_children($data) as $series) {
     $series_data = _charts_series_values($data[$series]);
 
-    $chart['chart'][] = _fusioncharts_values('set', $series_data);
+    $chart['chart'][] = _fusioncharts_values('dataSet', $series_data);
 
     foreach (element_children($data[$series]) as $values) {
       $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
@@ -104,7 +104,7 @@ function _fusioncharts_series(&$chart, &$data) {
       }
     }
     if (!empty($toogle)) {
-      $chart['chart'][] = _fusioncharts_values('category', $value_labels);
+      $chart['chart'][] = _fusioncharts_values('categories', $value_labels);
     }
   }
 }
