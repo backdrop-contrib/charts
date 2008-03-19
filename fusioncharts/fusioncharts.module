@@ -24,8 +24,11 @@ function fusioncharts_chartsinfo($op) {
       return array(
         'line2D'  => t('Line 2D'),
         'hbar2D'  => t('Horizontal Bar 2D'),
+        'hbar3D'  => t('Horizontal Bar 3D'),
         'vbar2D'  => t('Vertical Bar 2D'),
+        'vbar3D'  => t('Vertical Bar 3D'),
         'pie2D'   => t('Pie 2D'),
+        'pie3D'   => t('Pie 3D'),
       );
   }
 }
@@ -47,6 +50,12 @@ function fusioncharts_chartsapi(&$data) {
   // was not found, return nothing and stop the execution.
   $options = array(
     'line2D'  => '/swf/MSLine.swf',
+    'hbar2D'  => '/swf/MSBar2D.swf',
+    'hbar3D'  => '/swf/MSBar3D.swf',
+    'vbar2D'  => '/swf/MSColumn2D.swf',
+    'vbar3D'  => '/swf/MSColumn3D.swf',
+    'pie2D'   => '/swf/Pie2D.swf',
+    'pie3D'   => '/swf/Pie3D.swf',
   );
   if (empty($options[$data['#type']])) {
     return t('This type is not possible using %chartplugin',
