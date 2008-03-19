@@ -20,15 +20,15 @@
  */
 function _fusioncharts_values($type, $data, $options = array()) {
   switch ($type) {
-    case 'categories':
+    case 'category':
       $attr         = 'label';
       $global_type  = 'categories';
     break;
-    case 'dataSet':
+    case 'set':
       $attr         = 'value';
       $global_type  = 'dataSet';
     break;
-    case 'trendlines':
+    case 'trendline':
       $attr         = 'value';
       $global_type  = 'trendlines';
     break;
@@ -46,13 +46,18 @@ function _fusioncharts_values($type, $data, $options = array()) {
   }
 
   // Create the XML array
-  $data_complete = array(
-    'key'         => $global_type,
-    'value'       => $values,
-    'attributes'  => $options
-  );
-
-  return $data_complete;
+  if (empty($options['no_wrap'])) {
+    return array(
+      'key'         => $global_type,
+      'value'       => $values,
+      'attributes'  => $options
+    );
+  }
+  else {
+// z('--');
+// z($values);
+    return $values;
+  }
 }
 
 /**
@@ -85,7 +90,7 @@ function _fusioncharts_series(&$chart, &$data) {
   foreach (element_children($data) as $series) {
     $series_data = _charts_series_values($data[$series]);
 
-    $chart['chart'][] = _fusioncharts_values('dataSet', $series_data);
+    $chart['chart'][] = _fusioncharts_values('set', $series_data);
 
     foreach (element_children($data[$series]) as $values) {
       $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
@@ -104,7 +109,67 @@ function _fusioncharts_series(&$chart, &$data) {
       }
     }
     if (!empty($toogle)) {
-      $chart['chart'][] = _fusioncharts_values('categories', $value_labels);
+      $chart['chart'][] = _fusioncharts_values('category', $value_labels);
+    }
+  }
+}
+
+/**
+ * Convert all Series-level data.
+ *
+ * @param &$chart
+ *   Array. The array that will be converted into a string for FusionCharts
+ * @param &$data
+ *   Array. The raw data.
+ * @return
+ *   String. The string presentation of series data
+ */
+function _fusioncharts_series_single(&$chart, &$data) {
+  // Convert the chat DATA into the FusionCharts way.
+  // Since its a requirement to build the chart on FusionCharts, if the value
+  // was not found, return nothing and stop the execution.
+  foreach (element_children($data) as $series) {
+    if (!empty($toogle)) {
+      continue;
+    }
+    $toogle = TRUE;
+
+    foreach (element_children($data[$series]) as $values) {
+      $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
+
+      if (is_array($data[$series][$values])) {
+        $series_data[] = array(
+          'value' => $data[$series][$values]['#value'],
+          'label' => $data[$series][$values]['#label'],
+        );
+      }
+      else {
+        $series_data[] = array(
+          'value' => $data[$series][$values],
+        );
+      }
+    }
+
+    $options['no_wrap'] = TRUE;
+    $options['label'] = TRUE;
+    foreach (_fusioncharts_values('set', $series_data, $options) as $set) {
+      $chart['chart'][] = $set;
+    }
+
+    // X labels
+    $value_labels = array();
+    $toogle = FALSE;
+    foreach (array_keys($series_data) as $value) {
+      if (empty($data[$series][$value]['#label'])) {
+        $value_labels[] = '';
+      }
+      else {
+        $value_labels[] = $data[$series][$value]['#label'];
+        $toogle = TRUE;
+      }
+    }
+    if (!empty($toogle)) {
+      $chart['chart'][] = _fusioncharts_values('category', $value_labels);
     }
   }
 }
