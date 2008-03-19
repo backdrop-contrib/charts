@@ -78,12 +78,6 @@ function _charts_settings() {
     '#title'          => t('Chart type'),
   );
 
-  $form['color'] = array(
-    '#default_value'  => empty($settings['#color']) ? 'FFFFFF' : $settings['#color'],
-    '#description'    => t('Use the hexadecimal RGB value'),
-    '#type'           => 'textfield',
-    '#title'          => t('Background Color'),
-  );
   $form['width'] = array(
     '#default_value'  => empty($settings['#width']) ? 400 : $settings['#width'],
     '#description'    => t('The chart width, in pixels'),
@@ -97,38 +91,54 @@ function _charts_settings() {
     '#title'          => t('Height'),
   );
 
-  // Color for the series.
+  $form['color'] = array(
+    '#default_value'  => empty($settings['#color']) ? 'FFFFFF' : $settings['#color'],
+    '#description'    => t('Use the hexadecimal RGB value'),
+    '#type'           => 'textfield',
+    '#title'          => t('Background Color'),
+  );
+  // Color palette for the series and values.
+  $colors = empty($settings['#color_palette']) ?
+    array(
+      'FF8000',
+      'FFC080',
+      'FFDFBF',
+      'FFC080',
+      'FFCC00',
+      'FFE500',
+      'FFF9BF',
+      '78C0E9',
+      '179CE8',
+      '30769E',
+      'C8E9FC',
+      'ECF8FF',
+      '00CCFF',
+      '4086AA',
+      '91C3DC',
+      '87907D',
+      'AAB6A2',
+      '555555',
+      '666666',
+      '21B6A8',
+      '177F75',
+      'B6212D',
+      '7F171F',
+      'B67721',
+      '7F5417',
+    ) :
+    $settings['#color_palette'];
   $form['color_palette'] = array(
-    '#default_value'  => empty($settings[3]['#color_palette']) ?
-'FF8000
-FFC080
-FFDFBF
-FFC080
-FFCC00
-FFE500
-FFF9BF
-78C0E9
-179CE8
-30769E
-C8E9FC
-ECF8FF
-00CCFF
-4086AA
-91C3DC
-87907D
-AAB6A2
-555555
-666666
-21B6A8
-177F75
-B6212D
-7F171F
-B67721
-7F5417' :
-      $settings[3]['#color_palette'],
+    '#default_value'  => implode(', ', $colors),
     '#description'    => t('Used to differentiate series or pie-chart pieces. Use the hexadecimal RGB value'),
     '#type'           => 'textarea',
     '#title'          => t('Color Palete'),
+  );
+  $colors_example = '';
+  foreach ($colors as $color) {
+    $colors_example .= "<span style='color:#$color;'>########### $color ###########</span><br />";
+  }
+  $form['color_palette_example'] = array(
+    '#value'  => $colors_example,
   );
 
   $form['submit'] = array(
@@ -159,7 +169,7 @@ function _charts_settings_submit(&$form, &$form_state) {
     unset($settings[$index]);
   }
 
-  $settings['#color_palette'] = explode("\n", $settings['#color_palette']);
+  $settings['#color_palette'] = explode(', ', $settings['#color_palette']);
 
   // Save the data into database
   variable_set('charts_settings', $settings);
