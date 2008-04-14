@@ -75,6 +75,7 @@ function charts_chart(&$data) {
  */
 function charts_menu() {
   $items['admin/settings/charts'] = array(
+    'access arguments'  => array('access administration pages'),
     'description'     => 'Set the default behaviour and look of all your charts',
     'file'            => 'charts.inc',
     'page callback'   => 'drupal_get_form',
