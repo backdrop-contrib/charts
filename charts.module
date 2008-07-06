@@ -82,18 +82,13 @@ function charts_menu() {
     'page arguments'  => array('_charts_settings'),
     'title'           => 'Charts'
   );
-//   $items['admin/settings/charts/settings'] = array(
-//     'page arguments'  => array('_charts_settings'),
-//     'title'           => 'Settings',
-//     'type'            => MENU_DEFAULT_LOCAL_TASK,
-//   );
-//   $items['admin/settings/charts/testing'] = array(
-//     'file'            => 'charts.inc',
-//     'page callback'   => 'drupal_get_form',
-//     'page arguments'  => array('_charts_testing'),
-//     'title'           => 'Testing',
-//     'type'            => MENU_LOCAL_TASK,
-//   );
+  $items['admin/settings/charts/example'] = array(
+    'access arguments'  => array('access content'),
+    'file'            => 'charts.inc',
+    'page callback'   => '_charts_example',
+    'title'           => 'Example',
+    'type'            => MENU_CALLBACK,
+  );
   return $items;
 }
 
