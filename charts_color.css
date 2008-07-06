@@ -1,0 +1,69 @@
+/* $Id$ */
+
+/* Farbtastic placement */
+#charts_color {
+  max-width: 50em;
+  position: relative;
+}
+#farbtastic {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+/* All color-related */
+#charts_color .form-item {
+  height: 2em;
+  line-height: 2em;
+  padding-left: 1em; /* LTR */
+  margin: 0.5em 0;
+}
+#charts_color label {
+  float: left; /* LTR */
+  clear: left; /* LTR */
+  width: 10em;
+}
+#charts_color .form-text, #charts_color .form-select {
+  float: left; /* LTR */
+}
+#charts_color .form-text {
+  text-align: center;
+  margin-right: 5px; /* LTR */
+  cursor: pointer;
+}
+
+/* Palette */
+#palette .hook {
+  float: left; /* LTR */
+  margin-top: 3px;
+  width: 16px;
+  height: 16px;
+}
+#palette .down, #palette .up, #palette .both {
+  background: url(images/hook.png) no-repeat 100% 0; /* LTR */
+}
+#palette .up {
+  background-position: 100% -27px; /* LTR */
+}
+#palette .both {
+  background-position: 100% -54px; /* LTR */
+}
+#palette .lock {
+  float: left; /* LTR */
+  position: relative;
+  top: -1.4em;
+  left: -10px; /* LTR */
+  width: 20px;
+  height: 25px;
+  background: url(images/lock.png) no-repeat 50% 2px;
+  cursor: pointer;
+}
+#palette .unlocked {
+  background-position: 50% -22px;
+}
+#palette .form-item {
+  width: 20em;
+}
+#palette .item-selected {
+  background: #eee;
+}
