@@ -15,7 +15,7 @@
 function _charts_color_form(&$form, $form_state, $settings) {
   // The Color module integration starts with a field set
   $form['color'] = array(
-    '#attributes'     => array('id' => 'charts_color', 'class'=> ' clear-block'),
+    '#attributes'     => array('id' => 'charts_color', 'class' => ' clear-block'),
     '#collapsible'    => TRUE,
     '#type'           => 'fieldset',
     '#title'          => t('Color'),
