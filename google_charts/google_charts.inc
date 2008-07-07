@@ -94,9 +94,6 @@ function _google_charts_data_codingsimple($value, $max) {
  *   Array. The
  */
 function _google_charts_render(&$data) {
-  // Include the specific Google Chart API helper functions
-  include_once drupal_get_path('module', 'google_charts') .'/google_charts.inc';
-
   $chart = array();
   if ($message = _google_charts_chart($chart, $data)) {
     return $message;

@@ -82,9 +82,6 @@ function _fusioncharts_chart(&$chart, &$data) {
  *   Array. The
  */
 function _fusioncharts_charts_render(&$data) {
-  // Include the specific Google Chart API helper functions
-  include_once drupal_get_path('module', 'fusioncharts') .'/fusioncharts.inc';
-
   // Convert the chat TYPE into the FusionCharts way.
   // Since its a requirement to build the chart on Google, if the value
   // was not found, return nothing and stop the execution.

@@ -30,9 +30,6 @@ function _openflashchart_chart(&$chart, &$data) {
  *   Array. The
  */
 function _openflashchart_charts_render(&$data) {
-  // Include the specific Open Flash Chart helper functions
-  include_once drupal_get_path('module', 'openflashchart') .'/openflashchart.inc';
-
   $chart = new open_flash_chart_api();
 
   if ($error = _openflashchart_chart($chart, $data)) {
