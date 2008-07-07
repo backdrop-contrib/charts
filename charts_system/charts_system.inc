@@ -2,6 +2,7 @@
 // $Id$
 /**
  * @author Bruno Massa http://drupal.org/user/67164
+ * @author TJ (based on his Chart module)
  * @file
  * Use Charts for Drupal administration
  */
