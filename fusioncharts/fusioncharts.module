@@ -2,7 +2,7 @@
 // $Id$
 /**
  * @author Bruno Massa http://drupal.org/user/67164
- * @file fusioncharts.module
+ * @file
  * Use FusionCharts on your site.
  *
  * @note only hooks are here.

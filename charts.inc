@@ -2,8 +2,8 @@
 // $Id$
 /**
  * @author Bruno Massa http://drupal.org/user/67164
- * @file charts.inc
- * Transform DATA into INFORMATION using beautiful CHARTS.
+ * @file
+ * Settings function for Cahrts module.
  */
 
 /**

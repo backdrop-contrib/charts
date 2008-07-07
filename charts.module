@@ -2,7 +2,7 @@
 // $Id$
 /**
  * @author Bruno Massa http://drupal.org/user/67164
- * @file charts.module
+ * @file
  * Transform DATA into INFORMATION using beautiful CHARTS.
  *
  * @note only hooks are here.

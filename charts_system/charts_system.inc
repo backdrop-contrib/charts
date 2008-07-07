@@ -2,7 +2,7 @@
 // $Id$
 /**
  * @author Bruno Massa http://drupal.org/user/67164
- * @file charts_system.inc
+ * @file
  * Use Charts for Drupal administration
  */
 

@@ -2,7 +2,7 @@
 // $Id$
 /**
  * @author Bruno Massa http://drupal.org/user/67164
- * @file google_charts.inc
+ * @file
  * Use Google Charts on your site.
  */
 
