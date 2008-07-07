@@ -2,4 +2,5 @@
 core            = "6.x"
 dependencies[]  = charts
 description     = "Use Google Charts on your site."
-name            = "Charts: Google"
+name            = "Google"
+package         = "Charts"

@@ -2,4 +2,5 @@
 core            = "6.x"
 dependencies[]  = charts
 description     = "Use Open Flash Charts on your site."
-name            = "Charts: Open Flash Chart"
+name            = "Open Flash Chart"
+package         = "Charts"

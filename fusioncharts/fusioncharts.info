@@ -2,4 +2,5 @@
 core            = "6.x"
 dependencies[]  = charts
 description     = "Use FusionCharts on your site."
-name            = "Charts: FusionCharts"
+name            = "FusionCharts"
+package         = "Charts"
