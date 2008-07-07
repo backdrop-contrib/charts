@@ -75,7 +75,7 @@ function _google_charts_chart(&$chart, &$data) {
 function _google_charts_data_codingsimple($value, $max) {
   // Set the list of characters and the size of the list
   $simple = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  $simple_len = strlen($simple) - 1;
+  $simple_len = drupal_strlen($simple) - 1;
 
   if ($value >= 0) {
     return $simple[round($simple_len * $value / $max)];
