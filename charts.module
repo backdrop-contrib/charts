@@ -134,3 +134,14 @@ function _charts_series_values($series) {
 
   return $data;
 }
+
+/**
+ * Implementation of hook_theme().
+ */
+function charts_theme() {
+  return array(
+    '_charts_settings' => array(
+      'arguments' => array('form' => NULL),
+    ),
+  );
+}

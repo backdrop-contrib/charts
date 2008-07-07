@@ -7,11 +7,89 @@
  */
 Drupal.behaviors.charts_color = function (context) {
   /**
-   * Function copied from Color module
-   *
-   * Shift a given color, using a reference pair (ref in HSL).
-   */
-  function shift_color(given, ref1, ref2) {
+    * Function copied from Color module.
+    *
+    * Callback for Farbtastic when a new color is chosen.
+    */
+  callback = function (input, color, propagate, colorscheme) {
+    // Set background/foreground color
+    $(input).css({
+      backgroundColor: color,
+      'color': farb.RGBToHSL(farb.unpack(color))[2] > 0.5 ? '#000' : '#fff'
+    });
+
+    // Change input value
+    if (input.value && input.value != color) {
+      input.value = color;
+
+      // Update locked values
+      if (propagate) {
+        var i = input.i;
+        for (j = i + 1; ; ++j) {
+          if (!locks[j - 1] || $(locks[j - 1]).is('.unlocked')) break;
+          var matched = shift_color(color, reference[input.key], reference[inputs[j].key]);
+          callback(inputs[j], matched, false);
+        }
+        for (j = i - 1; ; --j) {
+          if (!locks[j] || $(locks[j]).is('.unlocked')) break;
+          var matched = shift_color(color, reference[input.key], reference[inputs[j].key]);
+          callback(inputs[j], matched, false);
+        }
+
+        // Update preview
+        preview();
+      }
+
+      // Reset colorscheme selector
+      if (!colorscheme) {
+        resetScheme();
+      }
+    }
+  }
+
+  /**
+    * Function copied from Color module.
+    *
+    * Focus the Farbtastic on a particular field.
+    */
+  focus = function () {
+    var input = this;
+    // Remove old bindings
+    focused && $(focused).unbind('keyup', farb.updateValue)
+        .unbind('keyup', preview).unbind('keyup', resetScheme)
+        .parent().removeClass('item-selected');
+
+    // Add new bindings
+    focused = this;
+    farb.linkTo(function (color) { callback(input, color, true, false); });
+    farb.setColor(this.value);
+    $(focused).keyup(farb.updateValue).keyup(preview).keyup(resetScheme)
+      .parent().addClass('item-selected');
+  }
+
+  /**
+  * Print a Chart (with generic data) preview.
+  */
+  preview = function () {
+  }
+
+  /**
+    * Function copied from Color module.
+    *
+    * Reset the color scheme selector.
+    */
+  resetScheme = function () {
+    $('#edit-scheme', form).each(function () {
+      this.selectedIndex = this.options.length - 1;
+    });
+  }
+
+  /**
+    * Function copied from Color module
+    *
+    * Shift a given color, using a reference pair (ref in HSL).
+    */
+  shift_color = function (given, ref1, ref2) {
     // Convert to HSL
     given = farb.RGBToHSL(farb.unpack(given));
 
@@ -47,86 +125,6 @@ Drupal.behaviors.charts_color = function (context) {
     }
 
     return farb.pack(farb.HSLToRGB(given));
-  }
-
-  /**
-   * Function copied from Color module.
-   *
-   * Callback for Farbtastic when a new color is chosen.
-   */
-  function callback(input, color, propagate, colorscheme) {
-
-    // Set background/foreground color
-    $(input).css({
-      backgroundColor: color,
-      'color': farb.RGBToHSL(farb.unpack(color))[2] > 0.5 ? '#000' : '#fff'
-    });
-
-    // Change input value
-    if (input.value && input.value != color) {
-      input.value = color;
-
-      // Update locked values
-      if (propagate) {
-        var i = input.i;
-        for (j = i + 1; ; ++j) {
-          if (!locks[j - 1] || $(locks[j - 1]).is('.unlocked')) break;
-          var matched = shift_color(color, reference[input.key], reference[inputs[j].key]);
-          callback(inputs[j], matched, false);
-        }
-        for (j = i - 1; ; --j) {
-          if (!locks[j] || $(locks[j]).is('.unlocked')) break;
-          var matched = shift_color(color, reference[input.key], reference[inputs[j].key]);
-          callback(inputs[j], matched, false);
-        }
-
-        // Update preview
-        preview();
-      }
-
-      // Reset colorscheme selector
-      if (!colorscheme) {
-        resetScheme();
-      }
-    }
-
-  }
-
-  /**
-   * Function copied from Color module.
-   *
-   * Reset the color scheme selector.
-   */
-  function resetScheme() {
-    $('#edit-scheme', form).each(function () {
-      this.selectedIndex = this.options.length - 1;
-    });
-  }
-
-  /**
-   * Function copied from Color module.
-   *
-   * Focus the Farbtastic on a particular field.
-   */
-  function focus() {
-    var input = this;
-    // Remove old bindings
-    focused && $(focused).unbind('keyup', farb.updateValue)
-        .unbind('keyup', preview).unbind('keyup', resetScheme)
-        .parent().removeClass('item-selected');
-
-    // Add new bindings
-    focused = this;
-    farb.linkTo(function (color) { callback(input, color, true, false); });
-    farb.setColor(this.value);
-    $(focused).keyup(farb.updateValue).keyup(preview).keyup(resetScheme)
-      .parent().addClass('item-selected');
-  }
-
-  /**
-  * Print a Chart (with generic data) preview.
-  */
-  function preview() {
   }
 
   // Declaring some variavles and settings some generic values
