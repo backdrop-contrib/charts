@@ -146,22 +146,25 @@ function _charts_settings($form_state) {
   // Get the previously saved data from Data Base
   $settings = variable_get('charts_settings', array());
 
-  $form['chart'] = array(
+  $form['chart_example'] = array(
     '#value'          => _charts_example(),
   );
 
-  $options = module_invoke_all('charts_info', 'list');
+  $charts_info = module_invoke_all('charts_info', 'list');
+  foreach ($charts_info as $chart_code => $chart) {
+    $chart_names[$chart_code]= $chart['name'];
+  }
+  asort($chart_names);
   $form['plugin'] = array(
     '#default_value'  => empty($settings['#plugin']) ? '' : $settings['#plugin'],
-    '#options'        => $options,
+    '#options'        => $chart_names,
     '#type'           => 'select',
     '#title'          => t('Chart plugin'),
   );
-  $options = _charts_module_invoke_all('charts_info', 'charttypes');
-  asort($options);
+  asort($charts_info[$settings['#plugin']]['types']);
   $form['type'] = array(
     '#default_value'  => empty($settings['#type']) ? '' : $settings['#type'],
-    '#options'        => $options,
+    '#options'        => $charts_info[$settings['#plugin']]['types'],
     '#type'           => 'select',
     '#title'          => t('Chart type'),
   );

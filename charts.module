@@ -64,8 +64,15 @@ function charts_chart(&$data) {
   // Now, merge all the rest of the options saved by default
   $data = array_merge($settings, $data);
 
-  $chart_provider = $data['#plugin'] .'_charts_render';
-  return $chart_provider($data);
+  // Get the information about chart modules
+  $chart_provider = module_invoke_all('charts_info');
+
+  // Include the file that has the rendering function
+  include_once $chart_provider[$data['#plugin']]['file'];
+  $func = $chart_provider[$data['#plugin']]['render'];
+
+  // Using the filter's rendering function, print the chart
+  return $func($data);
 }
 
 /**

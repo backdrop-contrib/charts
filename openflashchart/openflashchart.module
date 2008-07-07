@@ -15,19 +15,20 @@
  * of a chart provider, like its name, what types of charts
  * it can perform and what are the restrictions.
  */
-function openflashchart_charts_info($op) {
-  switch ($op) {
-    case 'list':
-      return array('openflashchart' => 'Open Flash Chart');
-
-    case 'charttypes':
-      return array(
+function openflashchart_charts_info() {
+  return array(
+    'openflashchart' => array(
+      'file'    => drupal_get_path('module', 'openflashchart') .'/openflashchart.inc',
+      'name'    => t('Open Flash Chart'),
+      'render'  => '_openflashchart_charts_render',
+      'types'   => array(
         'line2D'  => t('Line 2D'),
         'vbar2D'  => t('Vertical Bar 2D'),
         'vbar3D'  => t('Vertical Bar 3D'),
         'pie2D'   => t('Pie 2D'),
-      );
-  }
+      ),
+    ),
+  );
 }
 
 /**
@@ -38,7 +39,7 @@ function openflashchart_charts_info($op) {
  * @param &$data
  *   Array. The
  */
-function openflashchart_charts_render(&$data) {
+function _openflashchart_charts_render(&$data) {
   // Include the specific Open Flash Chart helper functions
   include_once drupal_get_path('module', 'openflashchart') .'/openflashchart.inc';
 

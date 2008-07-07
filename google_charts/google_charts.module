@@ -9,19 +9,19 @@
  */
 
 /**
- * Immplementation of hook_charts_render().
+ * Immplementation of hook_charts_info().
  *
  * Its a Charts module hook. It defines almost all aspects
  * of a chart provider, like its name, what types of charts
  * it can perform and what are the restrictions.
  */
-function google_charts_charts_info($op) {
-  switch ($op) {
-    case 'list':
-      return array('google_charts' => 'Google Chart API');
-
-    case 'charttypes':
-      return array(
+function google_charts_charts_info() {
+  return array(
+    'google' => array(
+      'file'    => drupal_get_path('module', 'google_charts') .'/google_charts.inc',
+      'name'    => t('Google Chart'),
+      'render'  => 'google_charts_charts_render',
+      'types'   => array(
         'line2D'  => t('Line 2D'),
         'hbar2D'  => t('Horizontal Bar 2D'),
         'vbar2D'  => t('Vertical Bar 2D'),
@@ -29,8 +29,9 @@ function google_charts_charts_info($op) {
         'pie3D'   => t('Pie 3D'),
         'venn'    => t('Venn'),
         'scatter' => t('Scatter Plot'),
-      );
-  }
+      ),
+    ),
+  );
 }
 
 /**
