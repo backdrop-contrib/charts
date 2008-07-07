@@ -9,7 +9,7 @@
  */
 
 /**
- * Immplementation of hook_chartsapi().
+ * Immplementation of hook_charts_info().
  *
  * Its a Charts module hook. It defines almost all aspects
  * of a chart provider, like its name, what types of charts
@@ -31,14 +31,14 @@ function openflashchart_charts_info($op) {
 }
 
 /**
- * Immplementation of hook_chartsapi().
+ * Immplementation of hook_charts_render().
  *
  * Its a Charts module hook. It transform the data into a HTML chart.
  *
  * @param &$data
  *   Array. The
  */
-function openflashchart_chartsapi(&$data) {
+function openflashchart_charts_render(&$data) {
   // Include the specific Open Flash Chart helper functions
   include_once drupal_get_path('module', 'openflashchart') .'/openflashchart.inc';
 

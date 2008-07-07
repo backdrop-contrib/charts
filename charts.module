@@ -64,10 +64,8 @@ function charts_chart(&$data) {
   // Now, merge all the rest of the options saved by default
   $data = array_merge($settings, $data);
 
-  $chart_provider = $data['#plugin'] .'_chartsapi';
-  if (function_exists($chart_provider)) {
-    return $chart_provider($data);
-  }
+  $chart_provider = $data['#plugin'] .'_charts_render';
+  return $chart_provider($data);
 }
 
 /**
