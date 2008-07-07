@@ -7,11 +7,12 @@
  */
 
 /**
- * Color module integration with Charts settings.
+ * Subform that integartes Color module with Charts settings. Its called
+ * inside the Charts settings page, by _charts_settings().
  *
  * @ingroup from
  */
-function _charts_color_form(&$form, $form_state) {
+function _charts_color_form(&$form, $form_state, $settings) {
   // The Color module integration starts with a field set
   $form['color'] = array(
     '#attributes'     => array('id' => 'charts_color', 'class'=> ' clear-block'),
@@ -26,46 +27,36 @@ function _charts_color_form(&$form, $form_state) {
     '#type'           => 'select',
     '#title'          => t('Color set'),
     '#options'        => $schemes,
-    '#default_value'  => '',
-  );
-  $form['color']['schemes'] = array(
-    '#type'           => 'value',
-    '#value'          => $schemes
+    '#default_value'  => $settings['#color_palette'],
   );
 
   // Add palette fields. Since all
+  $color_palette = explode(',', $settings['#color_palette']);
+
   $names = array(
-    'color1'    => t('Color %number', array('%number' => 1)),
-    'color2'    => t('Color %number', array('%number' => 2)),
-    'color3'    => t('Color %number', array('%number' => 3)),
-    'color4'    => t('Color %number', array('%number' => 4)),
-    'color5'    => t('Color %number', array('%number' => 5)),
-    'color65'   => t('Color %number', array('%number' => 6)),
-    'color7'    => t('Color %number', array('%number' => 7)),
-    'color8'    => t('Color %number', array('%number' => 8)),
-  );
-  $reference_colors = array(
-    'color1'    => '#ffffff',
-    'color2'    => '#ffffff',
-    'color3'    => '#ffffff',
-    'color4'    => '#ffffff',
-    'color5'    => '#ffffff',
-    'color65'   => '#ffffff',
-    'color7'    => '#ffffff',
-    'color8'    => '#ffffff',
+    t('Color %number', array('%number' => 1)),
+    t('Color %number', array('%number' => 2)),
+    t('Color %number', array('%number' => 3)),
+    t('Color %number', array('%number' => 4)),
+    t('Color %number', array('%number' => 5)),
+    t('Color %number', array('%number' => 6)),
+    t('Color %number', array('%number' => 7)),
+    t('Color %number', array('%number' => 8)),
   );
   $form['color']['palette'] = array(
     '#prefix'           => '<div id="preview"></div><div id="farbtastic"></div><div id="palette" class="clear-block">',
     '#suffix'           => '</div>',
     '#tree'             => true,
   );
-  foreach ($reference_colors as $name => $value) {
-    $form['color']['palette'][$name] = array(
+  foreach ($names as $color => $value) {
+    $form['color']['palette']['color'. $color] = array(
       '#type'           => 'textfield',
-      '#title'          => $names[$name],
-      '#default_value'  => $value,
+      '#title'          => $value,
+      '#default_value'  => empty($color_palette[$color]) ? '#336699' : $color_palette[$color],
       '#size'           => 8,
     );
+    $color_palette['color'. $color] = $color_palette[$color];
+    unset($color_palette[$color]);
   }
   $form['color']['farbtastic'] = array(
     '#prefix'          => '<div id="farbtastic">',
@@ -73,9 +64,7 @@ function _charts_color_form(&$form, $form_state) {
   );
 
   // Add the necessary JS data into the page
-  drupal_add_js(array('charts_color' => array('reference' => $reference_colors)), 'setting');
-
-  return $form;
+  drupal_add_js(array('charts_color' => array('reference' => $color_palette)), 'setting');
 }
 
 /**
@@ -87,6 +76,37 @@ function _charts_color_palette() {
     '#FF0000,#00CC00,#0066B3,#FF8000,#FFCC00,#330099,#990099,#CCFF00' => t('Primary'),
     '#FF6600,#009999,#1919B3,#FFB200,#FFFF00,#660099,#E60066,#33FF00' => t('Secondary'),
   );
+}
+
+/**
+ * Generate a generic chart example
+ *
+ * @param $data
+ *   Array (optional). Chart data, following the Charts Schema
+ * @return
+ *   HTML. The generic Chart example
+ */
+function _charts_example($data = array()) {
+  if (empty($data)) {
+    // This will hold the example chart
+    // Since the chart is an example, we should provide
+    // and example data.
+    $data[] = array(
+      '#legend'     => 'Profit',
+      array('#value' => 35, '#label' => t('Jan')),
+      array('#value' => 25, '#label' => t('Feb')),
+      array('#value' => 75, '#label' => t('Mar')),
+      array('#value' => 50, '#label' => t('Apr')),
+      array('#value' => 23, '#label' => t('May')),
+      array('#value' => 12, '#label' => t('Jun')),
+    );
+    $data[] = array(
+      '#legend'     => 'Revenue',
+      10, 20, 55, 72, 45, 50
+    );
+    $data['#title'] = 'Testing Chart';
+  }
+  return charts_chart($data);
 }
 
 /**
@@ -124,25 +144,8 @@ function _charts_settings($form_state) {
   // Get the previously saved data from Data Base
   $settings = variable_get('charts_settings', array());
 
-  // This will hold the example chart
-  // Since the chart is an example, we should provide
-  // and example data.
-  $data[] = array(
-    '#legend'     => 'Profit',
-    array('#value' => 35, '#label' => t('Jan')),
-    array('#value' => 25, '#label' => t('Feb')),
-    array('#value' => 75, '#label' => t('Mar')),
-    array('#value' => 50, '#label' => t('Apr')),
-    array('#value' => 23, '#label' => t('May')),
-    array('#value' => 12, '#label' => t('Jun')),
-  );
-  $data[] = array(
-    '#legend'     => 'Revenue',
-    10, 20, 55, 72, 45, 50
-  );
-  $data['#title'] = 'Testing Chart';
   $form['chart'] = array(
-    '#value'          => charts_chart($data)
+    '#value'          => _charts_example(),
   );
 
   $options = module_invoke_all('chartsinfo', 'list');
@@ -164,67 +167,19 @@ function _charts_settings($form_state) {
   $form['width'] = array(
     '#default_value'  => empty($settings['#width']) ? 400 : $settings['#width'],
     '#description'    => t('The chart width, in pixels'),
+    '#size'           => 8,
     '#type'           => 'textfield',
     '#title'          => t('Width'),
   );
   $form['height'] = array(
     '#default_value'  => empty($settings['#height']) ? 200 : $settings['#height'],
     '#description'    => t('The chart height, in pixels'),
+    '#size'           => 8,
     '#type'           => 'textfield',
     '#title'          => t('Height'),
   );
 
-//   $form['color'] = array(
-//     '#default_value'  => empty($settings['#color']) ? 'FFFFFF' : $settings['#color'],
-//     '#description'    => t('Use the hexadecimal RGB value'),
-//     '#type'           => 'textfield',
-//     '#title'          => t('Background Color'),
-//   );
-
-  _charts_color_form($form, $form_state);
-  // Color palette for the series and values.
-//   $colors = empty($settings['#color_palette']) ?
-//     array(
-//       'FF8000',
-//       'FFC080',
-//       'FFDFBF',
-//       'FFC080',
-//       'FFCC00',
-//       'FFE500',
-//       'FFF9BF',
-//       '78C0E9',
-//       '179CE8',
-//       '30769E',
-//       'C8E9FC',
-//       'ECF8FF',
-//       '00CCFF',
-//       '4086AA',
-//       '91C3DC',
-//       '87907D',
-//       'AAB6A2',
-//       '555555',
-//       '666666',
-//       '21B6A8',
-//       '177F75',
-//       'B6212D',
-//       '7F171F',
-//       'B67721',
-//       '7F5417',
-//     ) :
-//     $settings['#color_palette'];
-//   $form['color_palette'] = array(
-//     '#default_value'  => implode(', ', $colors),
-//     '#description'    => t('Used to differentiate series or pie-chart pieces. Use the hexadecimal RGB value'),
-//     '#type'           => 'textarea',
-//     '#title'          => t('Color Palette'),
-//   );
-//   $colors_example = '';
-//   foreach ($colors as $color) {
-//     $colors_example .= "<span style='color:#$color;'>########### $color ###########</span><br />";
-//   }
-//   $form['color_palette_example'] = array(
-//     '#value'  => $colors_example,
-//   );
+  _charts_color_form($form, $form_state, $settings);
 
   $form['submit'] = array(
     '#type'           => 'submit',
@@ -242,25 +197,27 @@ function _charts_settings($form_state) {
  */
 function _charts_settings_submit(&$form, &$form_state) {
   $settings = $form_state['values'];
+
+  // Discart all form values non related to charts
   unset($settings['submit']);
   unset($settings['form_id']);
   unset($settings['form_build_id']);
   unset($settings['form_token']);
   unset($settings['op']);
 
-  // Add a '#' in all field names
+  // Add a '#' in all field names, as they will be used like a
+  // Form API field attributes
   foreach ($settings as $index => $value) {
     $settings["#$index"] = $value;
     unset($settings[$index]);
   }
 
-  $settings['#color_palette'] = explode(', ', $settings['#color_palette']);
+  $settings['#color_palette'] = implode(',', $settings['#palette']);
+  unset($settings['#palette']);
+  unset($settings['#scheme']);
 
   // Save the data into database
   variable_set('charts_settings', $settings);
-
-  // Print a 'OK' message
-  drupal_set_message('Settings saved');
 }
 
 /**
