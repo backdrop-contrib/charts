@@ -15,7 +15,7 @@
  * of a chart provider, like its name, what types of charts
  * it can perform and what are the restrictions.
  */
-function google_charts_chartsinfo($op) {
+function google_charts_charts_info($op) {
   switch ($op) {
     case 'list':
       return array('google_charts' => 'Google Chart API');

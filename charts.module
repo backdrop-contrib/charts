@@ -96,7 +96,7 @@ function charts_menu() {
  * Implementation of hook_requirements().
  */
 function charts_requirements($phase) {
-  if ($phase == 'runtime' and !$modules = module_invoke_all('chartsinfo', 'list')) {
+  if ($phase == 'runtime' and !$modules = module_invoke_all('charts_info', 'list')) {
     $requirements['charts']['title']        = t('Charts');
     $requirements['charts']['value']        = t('No Charts provider installed');
     $requirements['charts']['severity']     = REQUIREMENT_ERROR;

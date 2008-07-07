@@ -150,14 +150,14 @@ function _charts_settings($form_state) {
     '#value'          => _charts_example(),
   );
 
-  $options = module_invoke_all('chartsinfo', 'list');
+  $options = module_invoke_all('charts_info', 'list');
   $form['plugin'] = array(
     '#default_value'  => empty($settings['#plugin']) ? '' : $settings['#plugin'],
     '#options'        => $options,
     '#type'           => 'select',
     '#title'          => t('Chart plugin'),
   );
-  $options = _charts_module_invoke_all('chartsinfo', 'charttypes');
+  $options = _charts_module_invoke_all('charts_info', 'charttypes');
   asort($options);
   $form['type'] = array(
     '#default_value'  => empty($settings['#type']) ? '' : $settings['#type'],

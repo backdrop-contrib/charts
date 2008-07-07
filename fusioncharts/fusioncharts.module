@@ -15,7 +15,7 @@
  * of a chart provider, like its name, what types of charts
  * it can perform and what are the restrictions.
  */
-function fusioncharts_chartsinfo($op) {
+function fusioncharts_charts_info($op) {
   switch ($op) {
     case 'list':
       return array('fusioncharts' => 'FusionCharts');
