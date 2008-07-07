@@ -52,7 +52,7 @@ function _charts_color_form(&$form, $form_state, $settings) {
     $form['color']['palette']['color'. $color] = array(
       '#type'           => 'textfield',
       '#title'          => $value,
-      '#default_value'  => empty($color_palette[$color]) ? '#336699' : $color_palette[$color],
+      '#default_value'  => empty($color_palette[$color]) ? '336699' : $color_palette[$color],
       '#size'           => 8,
     );
     $color_palette['color'. $color] = $color_palette[$color];
@@ -73,8 +73,10 @@ function _charts_color_form(&$form, $form_state, $settings) {
 function _charts_color_palette() {
   return array(
     '' => t('Custom'),
-    '#FF0000,#00CC00,#0066B3,#FF8000,#FFCC00,#330099,#990099,#CCFF00' => t('Primary'),
-    '#FF6600,#009999,#1919B3,#FFB200,#FFFF00,#660099,#E60066,#33FF00' => t('Secondary'),
+    '#ff0000,#00cc00,#0066b3,#ff8000,#ffcc00,#330099,#990099,#ccff00' => t('Primary'),
+    '#ff6600,#009999,#1919b3,#ffb200,#ffff00,#660099,#e60066,#33ff00' => t('Secondary'),
+//     'ff0000,00cc00,0066b3,ff8000,ffcc00,330099,990099,ccff00' => t('Primary'),
+//     'ff6600,009999,1919b3,ffb200,ffff00,660099,e60066,33ff00' => t('Secondary'),
   );
 }
 
@@ -212,6 +214,9 @@ function _charts_settings_submit(&$form, &$form_state) {
     unset($settings[$index]);
   }
 
+  // Save the Color palette. Firts, filter the data, cluster the results
+  // into a single string. Finally, unset all field values, since they
+  // are useless
   $settings['#color_palette'] = implode(',', $settings['#palette']);
   unset($settings['#palette']);
   unset($settings['#scheme']);

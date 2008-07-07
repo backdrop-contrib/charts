@@ -20,19 +20,18 @@
  *   JavaScript external files)
  */
 function charts_chart(&$data) {
-  // Get the previously saved data from Data Base
+  // Get the previously saved data from database
   $settings = variable_get('charts_settings', array());
 
+  // Split the color palette data into inidividual values
+  $color_palette = explode(',', ereg_replace('#', '', $settings['#color_palette']));
+
+  // Check if the Chart will use the color palette for individual values
+  // instead for series, like Pie Charts
   $options = array('pie2D' => TRUE, 'pie3D' => TRUE);
-  if (!empty($data['#type'])) {
-    if (!empty($options[$data['#type']])) {
-      $color_palette = TRUE;
-    }
-  }
-  elseif (!empty($settings['#type'])) {
-    if (!empty($options[$settings['#type']])) {
-      $color_palette = TRUE;
-    }
+  if ((!empty($data['#type']) and !empty($options[$data['#type']]) ) or
+      (!empty($settings['#type']) and !empty($options[$settings['#type']]) ) ) {
+    $individual_color_palette = TRUE;
   }
 
   // Merge all series option to the main data array,
@@ -42,20 +41,21 @@ function charts_chart(&$data) {
     }
     unset($settings[$series]);
 
-    // Color Palette
-    if (empty($color_palette) and empty($data[$series]['#color'])) {
-      $data[$series]['#color'] = trim($settings['#color_palette'][$series]);
+    // Apply the Color Palette: normally, apply one color to each series.
+    // But for some types of charts, is one color to each value into the series
+    if (empty($individual_color_palette) and empty($data[$series]['#color'])) {
+      $data[$series]['#color'] = $color_palette[$series];
     }
-    elseif (!empty($color_palette)) {
+    elseif (!empty($individual_color_palette)) {
       foreach (element_children($data[$series]) as $values) {
         if (!is_array($data[$series][$values])) {
           $data[$series][$values] = array(
             '#value' => $data[$series][$values],
-            '#color' => trim($settings['#color_palette'][$values])
+            '#color' => $color_palette[$values],
           );
         }
         elseif (empty($data[$series][$values]['#color'])) {
-          $data[$series][$values]['#color'] = trim($settings['#color_palette'][$values]);
+          $data[$series][$values]['#color'] = $color_palette[$values];
         }
       }
     }
