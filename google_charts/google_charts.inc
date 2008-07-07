@@ -86,6 +86,34 @@ function _google_charts_data_codingsimple($value, $max) {
 }
 
 /**
+ * Immplementation of hook_charts_render().
+ *
+ * Its a Charts module hook. It transform the data into a HTML chart.
+ *
+ * @param &$data
+ *   Array. The
+ */
+function _google_charts_render(&$data) {
+  // Include the specific Google Chart API helper functions
+  include_once drupal_get_path('module', 'google_charts') .'/google_charts.inc';
+
+  $chart = array();
+  if ($message = _google_charts_chart($chart, $data)) {
+    return $message;
+  }
+
+  // Convert the chat DATA into the Google Chart way.
+  // Since its a requirement to build the chart on Google, if the value
+  // was not found, return nothing and stop the execution.
+  if ($message = _google_charts_series($chart, $data)) {
+    return $message;
+  }
+
+  // If its all ok, build the HTML img tag
+  return '<img src="http://chart.apis.google.com/chart?'. implode('&amp;', $chart) .'" />';
+}
+
+/**
  * Convert all Series-level data.
  *
  * @param &$chart

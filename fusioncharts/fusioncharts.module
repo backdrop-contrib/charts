@@ -20,7 +20,7 @@ function fusioncharts_charts_info() {
     'fusioncharts' => array(
       'file'    => drupal_get_path('module', 'fusioncharts') .'/fusioncharts.inc',
       'name'    => t('FusionCharts'),
-      'render'  => 'fusioncharts_charts_render',
+      'render'  => '_fusioncharts_charts_render',
       'types'   => array(
         'line2D'  => t('Line 2D'),
         'hbar2D'  => t('Horizontal Bar 2D'),
@@ -32,73 +32,4 @@ function fusioncharts_charts_info() {
       ),
     ),
   );
-}
-
-/**
- * Immplementation of hook_charts_render().
- *
- * Its a Charts module hook. It transform the data into a HTML chart.
- *
- * @param &$data
- *   Array. The
- */
-function fusioncharts_charts_render(&$data) {
-  // Include the specific Google Chart API helper functions
-  include_once drupal_get_path('module', 'fusioncharts') .'/fusioncharts.inc';
-
-  // Convert the chat TYPE into the FusionCharts way.
-  // Since its a requirement to build the chart on Google, if the value
-  // was not found, return nothing and stop the execution.
-  $options = array(
-    'line2D'  => '/swf/MSLine.swf',
-    'hbar2D'  => '/swf/MSBar2D.swf',
-    'hbar3D'  => '/swf/MSBar3D.swf',
-    'vbar2D'  => '/swf/MSColumn2D.swf',
-    'vbar3D'  => '/swf/MSColumn3D.swf',
-    'pie2D'   => '/swf/Pie2D.swf',
-    'pie3D'   => '/swf/Pie3D.swf',
-  );
-  if (empty($options[$data['#type']])) {
-    return t('This type is not possible using %chartplugin',
-      array('%chartplugin' => 'FusionCharts'));
-  }
-  $file = url(drupal_get_path('module', 'fusioncharts') . $options[$data['#type']]);
-
-  // Convert the chat SIZE into the FusionCharts way.
-  // Since its a requirement to build the chart on Google, if the value
-  // was not found, return nothing and stop the execution.
-  if (empty($data['#width']) or empty($data['#height'])) {
-    return '';
-  }
-  $width  = $data['#width'];
-  $height = $data['#height'];
-
-  $chart = array(
-    'key'   => 'chart',
-    'value' => array()
-  );
-
-  if ($message = _fusioncharts_chart($chart, $data)) {
-    return $message;
-  }
-
-  $series = '_fusioncharts_series';
-  if ($data['#type'] == 'pie2D' or $data['#type'] == 'pie3D') {
-    $series = '_fusioncharts_series_single';
-  }
-  if ($message = $series($chart, $data)) {
-    return $message;
-  }
-
-  $chart =  '&dataXML='. str_replace('"', "'", format_xml_elements(array($chart)));
-
-  // Its the HTML tag to include the chart
-  return <<<FUSIONCHARTS
-<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
-  <param name="allowScriptAccess" value="always" />
-  <param name="FlashVars" value="$chart" />
-  <param name="quality" value="high" />
-  <embed src="$file" flashVars="$chart" width="$width" height="$height" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
-</object>
-FUSIONCHARTS;
 }

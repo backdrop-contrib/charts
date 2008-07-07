@@ -30,28 +30,3 @@ function openflashchart_charts_info() {
     ),
   );
 }
-
-/**
- * Immplementation of hook_charts_render().
- *
- * Its a Charts module hook. It transform the data into a HTML chart.
- *
- * @param &$data
- *   Array. The
- */
-function _openflashchart_charts_render(&$data) {
-  // Include the specific Open Flash Chart helper functions
-  include_once drupal_get_path('module', 'openflashchart') .'/openflashchart.inc';
-
-  $chart = new open_flash_chart_api();
-
-  if ($error = _openflashchart_chart($chart, $data)) {
-    return $error;
-  }
-
-  if ($error = _openflashchart_series($chart, $data)) {
-    return $error;
-  }
-
-  return $chart->render();
-}
