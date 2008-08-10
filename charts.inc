@@ -46,7 +46,7 @@ function _charts_color_form(&$form, $form_state, $settings) {
   $form['color']['palette'] = array(
     '#prefix'           => '<div id="preview"></div><div id="farbtastic"></div><div id="palette" class="clear-block">',
     '#suffix'           => '</div>',
-    '#tree'             => true,
+    '#tree'             => TRUE,
   );
   foreach ($names as $color => $value) {
     $form['color']['palette']['color'. $color] = array(

@@ -86,7 +86,7 @@ function _google_charts_data_codingsimple($value, $max) {
 }
 
 /**
- * Immplementation of hook_charts_render().
+ * Implementation of hook_charts_render().
  *
  * Its a Charts module hook. It transform the data into a HTML chart.
  *
