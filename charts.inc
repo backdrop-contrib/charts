@@ -161,7 +161,9 @@ function _charts_settings($form_state) {
     '#type'           => 'select',
     '#title'          => t('Chart plugin'),
   );
-  asort($charts_info[$settings['#plugin']]['types']);
+  if (!empty($settings['#plugin'])) {
+    asort($charts_info[$settings['#plugin']]['types']);
+  }
   $form['type'] = array(
     '#default_value'  => empty($settings['#type']) ? '' : $settings['#type'],
     '#options'        => $charts_info[$settings['#plugin']]['types'],

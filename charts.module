@@ -20,12 +20,12 @@
  *   JavaScript external files)
  */
 function charts_chart(&$data) {
-  if (empty($data['#plugin'])) {
-    return '';
-  }
-
   // Get the previously saved data from database
   $settings = variable_get('charts_settings', array());
+
+  if (empty($data['#plugin']) and empty($settings['#plugin'])) {
+    return '';
+  }
 
   // Split the color palette data into inidividual values
   $color_palette = explode(',', ereg_replace('#', '', $settings['#color_palette']));
