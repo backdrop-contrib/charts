@@ -20,6 +20,10 @@
  *   JavaScript external files)
  */
 function charts_chart(&$data) {
+  if (empty($data['#plugin'])) {
+    return '';
+  }
+
   // Get the previously saved data from database
   $settings = variable_get('charts_settings', array());
 
