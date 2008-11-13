@@ -73,10 +73,11 @@ function charts_chart(&$data) {
 
   // Include the file that has the rendering function
   include_once $chart_provider[$data['#plugin']]['file'];
-  $func = $chart_provider[$data['#plugin']]['render'];
-
-  // Using the filter's rendering function, print the chart
-  return $func($data);
+  if ($func = $chart_provider[$data['#plugin']]['render']) {
+    // Using the filter's rendering function, print the chart
+    return $func($data);
+  }
+  return '';
 }
 
 /**
