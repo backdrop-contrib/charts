@@ -162,3 +162,13 @@ function charts_theme() {
     ),
   );
 }
+
+/**
+* Implementation of hook_views_api().
+*/
+function charts_views_api() {
+  return array(
+    'api' => 2,
+    'path' => drupal_get_path('module', 'charts') .'/views',
+  );
+}
