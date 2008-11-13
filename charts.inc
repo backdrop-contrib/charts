@@ -23,6 +23,9 @@ function _charts_color_form(&$form, $form_state, $settings) {
 
   // Load some color palettes
   $schemes = _charts_color_palette();
+  if (empty($settings['#color_palette'])) {
+    $settings['#color_palette'] = '0,0,0,0,0,0,0,0';
+  }
   $form['color']['scheme'] = array(
     '#type'           => 'select',
     '#title'          => t('Color set'),
@@ -166,7 +169,7 @@ function _charts_settings($form_state) {
   }
   $form['type'] = array(
     '#default_value'  => empty($settings['#type']) ? '' : $settings['#type'],
-    '#options'        => $charts_info[$settings['#plugin']]['types'],
+    '#options'        => isset($settings['#plugin']) ? $charts_info[$settings['#plugin']]['types'] : array(),
     '#type'           => 'select',
     '#title'          => t('Chart type'),
   );
@@ -237,7 +240,7 @@ function _charts_settings_submit(&$form, &$form_state) {
  */
 function theme__charts_settings($form) {
   // Preview
-  $output .= '<div id="preview"></div>';
+  $output = '<div id="preview"></div>';
 
   // The rest of the form
   $output .= drupal_render($form);
