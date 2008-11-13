@@ -113,6 +113,14 @@ function charts_requirements($phase) {
 
     return $requirements;
   }
+  elseif ($phase == 'runtime' and !$settings = variable_get('charts_settings', array())) {
+    $requirements['charts']['title']        = t('Charts');
+    $requirements['charts']['value']        = t('Charts module not yet configured');
+    $requirements['charts']['severity']     = REQUIREMENT_ERROR;
+    $requirements['charts']['description']  = t('Charts core module needs to get some default options in order to operate. You must go to <a href="!link">settings page</a> and configure it.', array('!link' => url('admin/settings/charts')));
+
+    return $requirements;
+  }
 }
 
 /**
