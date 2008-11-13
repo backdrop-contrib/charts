@@ -80,10 +80,10 @@ function _openflashchart_series(&$chart, &$data) {
 
     // Insert a new series of values
     if ($data['#type'] != 'pie2D') {
-      _openflashchart_series_generic(&$chart, &$data, $series);
+      _openflashchart_series_generic($chart, $data, $series);
     }
     elseif (empty($series)) {
-      _openflashchart_series_pie(&$chart, &$data, $series);
+      _openflashchart_series_pie($chart, $data, $series);
     }
   }
 }
