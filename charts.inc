@@ -18,7 +18,7 @@
  */
 function _charts_chart(&$data) {
   // Get the previously saved data from database
-  $settings = variable_get('charts_settings', array());
+  $settings = _charts_settings();
 
   if (empty($data['#plugin']) and empty($settings['#plugin'])) {
     return '';
@@ -79,4 +79,49 @@ function _charts_chart(&$data) {
     return $func($data);
   }
   return '';
+}
+
+/**
+ * Module settings page. Users can set the default layout
+ * of their charts.
+ *
+ * @ingroup form
+ */
+function _charts_settings() {
+  // Get the previously saved data from Data Base
+  static $settings;
+
+  if (empty($settings)) {
+    $settings = variable_get('charts_settings', array());
+
+    // Plugin
+    $charts_info = module_invoke_all('charts_info', 'list');
+    foreach ($charts_info as $chart_code => $chart) {
+      $settings['#plugins'][$chart_code] = $chart['name'];
+    }
+    asort($settings['#plugins']);
+    $settings['#plugin'] = empty($settings['#plugin']) ? current(array_keys($settings['#plugins'])) : $settings['#plugin'];
+
+    // Type
+    $settings['#types'] = module_invoke_all('chart_types');
+    $ctypes_allowed = array_fill_keys($charts_info[$settings['#plugin']]['types'], TRUE);
+    foreach (array_keys($settings['#types']) as $ctype_code) {
+      if (empty($ctypes_allowed[$ctype_code])) {
+        unset($settings['#types'][$ctype_code]);
+      }
+    }
+    $settings['#type']  = empty($settings['#type']) ? current(array_keys($settings['#types'])) : $settings['#type'];
+
+    // Width and
+    $settings['#width']  = empty($settings['#width'])  ? 400 : $settings['#width'];
+    $settings['#height'] = empty($settings['#height']) ? 200 : $settings['#height'];
+  }
+
+  // Color Palette
+  $settings['#color_palettes'] = _charts_color_palette();
+  if (empty($settings['#color_palette'])) {
+    $settings['#color_palette'] = '0,0,0,0,0,0,0,0';
+  }
+
+  return $settings;
 }
