@@ -21,15 +21,17 @@ function google_charts_charts_info() {
       'file'    => drupal_get_path('module', 'google_charts') .'/google_charts.inc',
       'name'    => t('Google Chart'),
       'render'  => '_google_charts_render',
-      'types'   => array(
-        'line2D'  => t('Line 2D'),
-        'hbar2D'  => t('Horizontal Bar 2D'),
-        'vbar2D'  => t('Vertical Bar 2D'),
-        'pie2D'   => t('Pie 2D'),
-        'pie3D'   => t('Pie 3D'),
-        'venn'    => t('Venn'),
-        'scatter' => t('Scatter Plot'),
-      ),
+      'types'   => array('line2D', 'hbar2D', 'vbar2D', 'pie2D', 'pie3D', 'venn', 'scatter'),
     ),
+  );
+}
+
+/**
+ * Immplementation of hook_chart_types().
+ */
+function google_charts_chart_types() {
+  return array(
+    'venn'    => t('Venn'),
+    'scatter' => t('Scatter Plot'),
   );
 }

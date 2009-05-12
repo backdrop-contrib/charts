@@ -3,256 +3,80 @@
 /**
  * @author Bruno Massa http://drupal.org/user/67164
  * @file
- * Settings function for Cahrts module.
+ * The real caller for building charts.
  */
 
 /**
- * Subform that integartes Color module with Charts settings. Its called
- * inside the Charts settings page, by _charts_settings().
+ * The main Chart API function, that calls any chart provider
+ * to print the given data.
  *
- * @ingroup from
- */
-function _charts_color_form(&$form, $form_state, $settings) {
-  // The Color module integration starts with a field set
-  $form['color'] = array(
-    '#attributes'     => array('id' => 'charts_color', 'class' => ' clear-block'),
-    '#collapsible'    => TRUE,
-    '#type'           => 'fieldset',
-    '#title'          => t('Color'),
-  );
-
-  // Load some color palettes
-  $schemes = _charts_color_palette();
-  if (empty($settings['#color_palette'])) {
-    $settings['#color_palette'] = '0,0,0,0,0,0,0,0';
-  }
-  $form['color']['scheme'] = array(
-    '#type'           => 'select',
-    '#title'          => t('Color set'),
-    '#options'        => $schemes,
-    '#default_value'  => $settings['#color_palette'],
-  );
-
-  // Add palette fields. Since all
-  $color_palette = explode(',', $settings['#color_palette']);
-
-  $names = array(
-    t('Color %number', array('%number' => 1)),
-    t('Color %number', array('%number' => 2)),
-    t('Color %number', array('%number' => 3)),
-    t('Color %number', array('%number' => 4)),
-    t('Color %number', array('%number' => 5)),
-    t('Color %number', array('%number' => 6)),
-    t('Color %number', array('%number' => 7)),
-    t('Color %number', array('%number' => 8)),
-  );
-  $form['color']['palette'] = array(
-    '#prefix'           => '<div id="preview"></div><div id="farbtastic"></div><div id="palette" class="clear-block">',
-    '#suffix'           => '</div>',
-    '#tree'             => TRUE,
-  );
-  foreach ($names as $color => $value) {
-    $form['color']['palette']['color'. $color] = array(
-      '#type'           => 'textfield',
-      '#title'          => $value,
-      '#default_value'  => empty($color_palette[$color]) ? '336699' : $color_palette[$color],
-      '#size'           => 8,
-    );
-    $color_palette['color'. $color] = $color_palette[$color];
-    unset($color_palette[$color]);
-  }
-  $form['color']['farbtastic'] = array(
-    '#prefix'          => '<div id="farbtastic">',
-    '#sufix'           => '</div>',
-  );
-
-  // Add the necessary JS data into the page
-  drupal_add_js(array('charts_color' => array('reference' => $color_palette)), 'setting');
-}
-
-/**
- * List all preset color palette
- */
-function _charts_color_palette() {
-  return array(
-    '' => t('Custom'),
-    '#ff0000,#00cc00,#0066b3,#ff8000,#ffcc00,#330099,#990099,#ccff00' => t('Primary'),
-    '#ff6600,#009999,#1919b3,#ffb200,#ffff00,#660099,#e60066,#33ff00' => t('Secondary'),
-//     'ff0000,00cc00,0066b3,ff8000,ffcc00,330099,990099,ccff00' => t('Primary'),
-//     'ff6600,009999,1919b3,ffb200,ffff00,660099,e60066,33ff00' => t('Secondary'),
-  );
-}
-
-/**
- * Generate a generic chart example
- *
- * @param $data
- *   Array (optional). Chart data, following the Charts Schema
+ * @param &$data
+ *   Array. The chart data, described on chart_api.txt
  * @return
- *   HTML. The generic Chart example
+ *   String. The HTML with the propper chart (might include Flash or
+ *   JavaScript external files)
  */
-function _charts_example($data = array()) {
-  if (empty($data)) {
-    // This will hold the example chart
-    // Since the chart is an example, we should provide
-    // and example data.
-    $data[] = array(
-      '#legend'     => 'Profit',
-      array('#value' => 35, '#label' => t('Jan')),
-      array('#value' => 25, '#label' => t('Feb')),
-      array('#value' => 75, '#label' => t('Mar')),
-      array('#value' => 50, '#label' => t('Apr')),
-      array('#value' => 23, '#label' => t('May')),
-      array('#value' => 12, '#label' => t('Jun')),
-    );
-    $data[] = array(
-      '#legend'     => 'Revenue',
-      10, 20, 55, 72, 45, 50
-    );
-    $data['#title'] = 'Testing Chart';
-  }
-  return charts_chart($data);
-}
-
-/**
- * Invoke a hook in all enabled modules that implement it.
- *
- * Its copy of module_invoke_all()
- * @see module_invoke_all()
- */
-function _charts_module_invoke_all() {
-  $args = func_get_args();
-  $hook = $args[0];
-  unset($args[0]);
-  $return = array();
-  foreach (module_implements($hook) as $module) {
-    $function = $module .'_'. $hook;
-    $result = call_user_func_array($function, $args);
-    if (isset($result) && is_array($result)) {
-      $return += $result;
-    }
-    elseif (isset($result)) {
-      $return[] = $result;
-    }
-  }
-
-  return $return;
-}
-
-/**
- * Module settings page. Users can set the default layout
- * of their charts.
- *
- * @ingroup form
- */
-function _charts_settings($form_state) {
-  // Get the previously saved data from Data Base
+function _charts_chart(&$data) {
+  // Get the previously saved data from database
   $settings = variable_get('charts_settings', array());
 
-  $form['chart_example'] = array(
-    '#value'          => _charts_example(),
-  );
-
-  $charts_info = module_invoke_all('charts_info', 'list');
-  foreach ($charts_info as $chart_code => $chart) {
-    $chart_names[$chart_code]= $chart['name'];
-  }
-  asort($chart_names);
-  $form['plugin'] = array(
-    '#default_value'  => empty($settings['#plugin']) ? '' : $settings['#plugin'],
-    '#options'        => $chart_names,
-    '#type'           => 'select',
-    '#title'          => t('Chart plugin'),
-  );
-  if (!empty($settings['#plugin'])) {
-    asort($charts_info[$settings['#plugin']]['types']);
-  }
-  $form['type'] = array(
-    '#default_value'  => empty($settings['#type']) ? '' : $settings['#type'],
-    '#options'        => isset($settings['#plugin']) ? $charts_info[$settings['#plugin']]['types'] : array(),
-    '#type'           => 'select',
-    '#title'          => t('Chart type'),
-  );
-
-  $form['width'] = array(
-    '#default_value'  => empty($settings['#width']) ? 400 : $settings['#width'],
-    '#description'    => t('The chart width, in pixels'),
-    '#size'           => 8,
-    '#type'           => 'textfield',
-    '#title'          => t('Width'),
-  );
-  $form['height'] = array(
-    '#default_value'  => empty($settings['#height']) ? 200 : $settings['#height'],
-    '#description'    => t('The chart height, in pixels'),
-    '#size'           => 8,
-    '#type'           => 'textfield',
-    '#title'          => t('Height'),
-  );
-
-  _charts_color_form($form, $form_state, $settings);
-
-  $form['submit'] = array(
-    '#type'           => 'submit',
-    '#value'          => t('Save settings'),
-  );
-
-  return $form;
-}
-
-/**
- * Module settings page. Users can set the default layout
- * of their charts.
- *
- * @ingroup form
- */
-function _charts_settings_submit(&$form, &$form_state) {
-  $settings = $form_state['values'];
-
-  // Discart all form values non related to charts
-  unset($settings['submit']);
-  unset($settings['form_id']);
-  unset($settings['form_build_id']);
-  unset($settings['form_token']);
-  unset($settings['op']);
-
-  // Add a '#' in all field names, as they will be used like a
-  // Form API field attributes
-  foreach ($settings as $index => $value) {
-    $settings["#$index"] = $value;
-    unset($settings[$index]);
+  if (empty($data['#plugin']) and empty($settings['#plugin'])) {
+    return '';
   }
 
-  // Save the Color palette. Firts, filter the data, cluster the results
-  // into a single string. Finally, unset all field values, since they
-  // are useless
-  $settings['#color_palette'] = implode(',', $settings['#palette']);
-  unset($settings['#palette']);
-  unset($settings['#scheme']);
+  // Split the color palette data into inidividual values
+  $color_palette = explode(',', ereg_replace('#', '', $settings['#color_palette']));
 
-  // Save the data into database
-  variable_set('charts_settings', $settings);
-}
+  // Check if the Chart will use the color palette for individual values
+  // instead for series, like Pie Charts
+  $options = array('pie2D' => TRUE, 'pie3D' => TRUE);
+  if ((!empty($data['#type']) and !empty($options[$data['#type']]) ) or
+      (!empty($settings['#type']) and !empty($options[$settings['#type']]) ) ) {
+    $individual_color_palette = TRUE;
+  }
 
-/**
- * Theme color form.
- *
- * @ingroup @themeable
- */
-function theme__charts_settings($form) {
-  // Preview
-  $output = '<div id="preview"></div>';
+  // Merge all series option to the main data array,
+  foreach (element_children($data) as $series) {
+    if (!empty($settings[$series])) {
+      $data[$series] = array_merge($settings[$series], $data[$series]);
+    }
+    unset($settings[$series]);
 
-  // The rest of the form
-  $output .= drupal_render($form);
+    // Apply the Color Palette: normally, apply one color to each series.
+    // But for some types of charts, is one color to each value into the series
+    if (empty($individual_color_palette) and empty($data[$series]['#color'])) {
+      $data[$series]['#color'] = $color_palette[$series];
+    }
+    elseif (!empty($individual_color_palette)) {
+      foreach (element_children($data[$series]) as $values) {
+        if (!is_array($data[$series][$values])) {
+          $data[$series][$values] = array(
+            '#value' => $data[$series][$values],
+            '#color' => $color_palette[$values],
+          );
+        }
+        elseif (empty($data[$series][$values]['#color'])) {
+          $data[$series][$values]['#color'] = $color_palette[$values];
+        }
+      }
+    }
+  }
 
-  // Add Farbtastic color picker JS
-  drupal_add_css('misc/farbtastic/farbtastic.css', 'module', 'all', FALSE);
-  drupal_add_js('misc/farbtastic/farbtastic.js');
-  drupal_add_js(drupal_get_path('module', 'charts') .'/charts_color.js');
+  // Now, merge all the rest of the options saved by default
+  $data = array_merge($settings, $data);
 
-  // Add the necessary CSS
-  drupal_add_css(drupal_get_path('module', 'charts') .'/charts_color.css');
+  // Get the information about chart modules
+  $chart_provider = module_invoke_all('charts_info');
 
-  // Put everything inside given DIV. Its necessary for JS code
-  return $output;
+  if (isset($chart_provider[$data['#plugin']]['file'])
+      and is_file($chart_provider[$data['#plugin']]['file'])
+      and $func = $chart_provider[$data['#plugin']]['render']) {
+
+    // Include the file that has the rendering function
+    include_once $chart_provider[$data['#plugin']]['file'];
+
+    // Using the filter's rendering function, print the chart
+    return $func($data);
+  }
+  return '';
 }

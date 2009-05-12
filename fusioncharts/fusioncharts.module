@@ -21,15 +21,17 @@ function fusioncharts_charts_info() {
       'file'    => drupal_get_path('module', 'fusioncharts') .'/fusioncharts.inc',
       'name'    => t('FusionCharts'),
       'render'  => '_fusioncharts_charts_render',
-      'types'   => array(
-        'line2D'  => t('Line 2D'),
-        'hbar2D'  => t('Horizontal Bar 2D'),
-        'hbar3D'  => t('Horizontal Bar 3D'),
-        'vbar2D'  => t('Vertical Bar 2D'),
-        'vbar3D'  => t('Vertical Bar 3D'),
-        'pie2D'   => t('Pie 2D'),
-        'pie3D'   => t('Pie 3D'),
-      ),
+      'types'   => array('line2D', 'hbar2D', 'hbar3D', 'vbar2D', 'vbar3D', 'pie2D', 'pie3D'),
     ),
+  );
+}
+
+/**
+ * Immplementation of hook_chart_types().
+ */
+function fusioncharts_chart_types() {
+  return array(
+    'hbar3D'    => t('Horizontal Bar 3D'),
+    'vbar3D'    => t('Vertical Bar 3D'),
   );
 }

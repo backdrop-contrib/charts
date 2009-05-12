@@ -21,12 +21,7 @@ function openflashchart_charts_info() {
       'file'    => drupal_get_path('module', 'openflashchart') .'/openflashchart.inc',
       'name'    => t('Open Flash Chart'),
       'render'  => '_openflashchart_charts_render',
-      'types'   => array(
-        'line2D'  => t('Line 2D'),
-        'vbar2D'  => t('Vertical Bar 2D'),
-        'vbar3D'  => t('Vertical Bar 3D'),
-        'pie2D'   => t('Pie 2D'),
-      ),
+      'types'   => array('line2D', 'vbar2D', 'vbar3D', 'pie2D'),
     ),
   );
 }
