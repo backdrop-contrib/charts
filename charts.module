@@ -71,9 +71,13 @@ function charts_chart(&$data) {
   // Get the information about chart modules
   $chart_provider = module_invoke_all('charts_info');
 
-  // Include the file that has the rendering function
-  include_once $chart_provider[$data['#plugin']]['file'];
-  if ($func = $chart_provider[$data['#plugin']]['render']) {
+  if (isset($chart_provider[$data['#plugin']]['file'])
+      and is_file($chart_provider[$data['#plugin']]['file'])
+      and $func = $chart_provider[$data['#plugin']]['render']) {
+
+    // Include the file that has the rendering function
+    include_once $chart_provider[$data['#plugin']]['file'];
+
     // Using the filter's rendering function, print the chart
     return $func($data);
   }
