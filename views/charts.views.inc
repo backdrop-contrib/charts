@@ -3,31 +3,35 @@
 /**
  * @author Bruno Massa http://drupal.org/user/67164
  * @file
- * Vinews integration with Charts.
+ * Views integration with Charts.
  */
 
 /**
- * Implementation of hook_views_plugins().
- *
- * Define charts style for Views.
- */
+* Implementation of hook_views_plugins().
+*
+* Define charts style for Views.
+*/
 function charts_views_plugins() {
+  // Views support is only possible if Views Calc module is enabled. It
+  // is responsible for turn the Views values into a aggregates.
+  if (!module_exists('views_calc')) {
+    return;
+  }
+
   return array(
     'module' => 'charts',
     'style'  => array(     // Declare the charts style plugin
       'chart' => array(
-        'path'            => drupal_get_path('module', 'charts') .'/views',
-        'title'           => t('Chart'),
-        //'theme'         => 'views_view_chart',
-        'help'            => t('Displays the content in several Chart styles.'),
         'handler'         => 'charts_plugin_style_chart',
-        'uses row plugin' => FALSE,
+        'help'            => t('Displays the content in several Chart styles.'),
+        'path'            => drupal_get_path('module', 'charts') .'/views',
+        'parent'          => 'parent',
+        'title'           => t('Chart'),
+        'type'            => 'normal',
         'uses fields'     => TRUE,
         'uses options'    => TRUE,
-        'type'            => 'normal',
-        'help topic'      => 'style-chart',
+        'uses row plugin' => FALSE,
       ),
     )
   );
 }
-

@@ -1,9 +1,10 @@
 <?php
 // $Id$
-
 /**
  * @file
  * Contains the chart style plugin.
+ * @author Bruno Massa      http://drupal.org/user/67164
+ * @author Karen Stevenson  http://drupal.org/user/45874
  */
 
 /**
@@ -12,24 +13,30 @@
  * @ingroup views_style_plugins
  */
 class charts_plugin_style_chart extends views_plugin_style {
-  // Set default options.
+  /**
+   * Set default options.
+   */
   function options(&$options) {
-    $options['format'] = 'pie2D';
-    $options['height'] = 200;
-    $options['width'] = 400;
-    $options['color'] = 'ffffff';
-    //$options['columns'] = array();
-    //$options['default'] = '';
-    //$options['info'] = array();
-    $options['conversion'] = 'rows';
+    $options['format']            = 'pie2D';
+    $options['height']            = 200;
+    $options['width']             = 400;
+    $options['color']             = 'ffffff';
+    $options['aggregation_field'] = '';
+    $options['calc_fields']       = array();
+    $options['calc']              = 'COUNT';
+    $options['precision']         = 2;
   }
 
-  // Generate a form for setting options.
+  /**
+   * Generate a form for setting options.
+   */
   function options_form(&$form, &$form_state) {
+    parent::options_form($form, $form_state);
+
     $form['format'] = array(
       '#type'    => 'select',
       '#title'   => t('Chart format'),
-      '#options' => array(
+      '#options'       => array(
         'line2D'  => t('Line 2D'),
         'hbar2D'  => t('Horizontal Bar 2D'),
         'vbar2D'  => t('Vertical Bar 2D'),
@@ -41,127 +48,109 @@ class charts_plugin_style_chart extends views_plugin_style {
       '#default_value' => $this->options['format'],
     );
     $form['height'] = array(
-      '#type'          => 'textfield',
-      '#title'         => t('Chart height'),
-      '#default_value' => $this->options['height'],
+      '#type'           => 'textfield',
+      '#title'          => t('Chart height'),
+      '#default_value'  => $this->options['height'],
+      '#required'       => TRUE, // Google charts breaks if it is empty.
+      '#description'    => t('An integer value, the number of pixels of height for this chart.'),
     );
     $form['width'] = array(
-      '#type'          => 'textfield',
-      '#title'         => t('Chart width'),
-      '#default_value' => $this->options['width'],
+      '#type'           => 'textfield',
+      '#title'          => t('Chart width'),
+      '#default_value'  => $this->options['width'],
+      '#required'       => TRUE, // Google charts breaks if it is empty.
+      '#description'    => t('An integer value, the number of pixels of width for this chart.'),
     );
     $form['color'] = array(
-      '#type'          => 'textfield',
-      '#title'         => t('Background color'),
-      '#default_value' => $this->options['color'],
-      '#description'   => t('In hexadecimal format (RRGGBB). Do not use the # symbol.'),
-    );
-    $form['conversion'] = array(
-      '#type'    => 'radios',
-      '#title'   => t('Conversion type'),
-      '#options' => array(
-        'rows'   => t('Display numbers from every row'),
-        'sum'    => t('Display sum of different values from one column'),
-      ),
-      '#default_value' => $this->options['conversion'],
-      '#description'   => t('In the first option every row will be a new x value in the chart. In the second option every different value in one column will be a new x value in the chart.'),
+      '#type'           => 'textfield',
+      '#title'          => t('Background color'),
+      '#default_value'  => $this->options['color'],
+      '#description'    => t('In hexadecimal format (RRGGBB). Do not use the # symbol.'),
+      '#required'       => TRUE, // Google charts breaks if it is empty.
     );
     $form['show_legend'] = array(
-      '#type'          => 'checkbox',
-      '#title'         => t('Show legend'),
-      '#default_value' => 1,
-      '#description'   => t('Display legend next to the chart.'),
+      '#type'           => 'checkbox',
+      '#title'          => t('Show legend'),
+      '#default_value'  => $this->options['show_legend'],
+      '#description'    => t('Display legend next to the chart.'),
+    );
+
+    $form['aggregation_field'] = array(
+      '#type'           => 'select',
+      '#title'          => t('Aggregation field'),
+      '#options'        => $this->aggregated_field_options(),
+      '#default_value'  => $this->options['aggregation_field'],
+      '#description'    => t('Select a field to aggreagate the results on.')
+      );
+    // TODO Charts module cannot currently handle more than one series,
+    // update Multiple to TRUE if that changes.
+    $form['calc_fields'] = array(
+      '#type'           => 'select',
+      '#title'          => t('Computation field'),
+      '#options'        => $this->aggregated_field_options(),
+      '#default_value'  => $this->calc_fields(),
+      '#multiple'       => FALSE,
+      '#description'    => t('Select field to perform computations on.')
+      );
+    $form['calc'] = array(
+      '#type'           => 'select',
+      '#title'          => t('Computation to perform'),
+      '#options'        => $this->calc_options(),
+      '#default_value'  => $this->options['calc'],
+      );
+    $form['precision'] = array(
+      '#type'           => 'select',
+      '#title'          => t('Precision'),
+      '#options'        => range(0, 4),
+      '#default_value'  => $this->options['precision'],
+      '#description'    => t('Decimal points to use in computed values.'),
+      );
+  }
+
+  /**
+   * Views Calc operation.
+   */
+  function calc_options() {
+    return array(
+      ''      => t('None'),
+      'SUM'   => t('Sum'),
+      'COUNT' => t('Count'),
+      'AVG'   => t('Average'),
+      'MIN'   => t('Minimum'),
+      'MAX'   => t('Maximum'),
     );
   }
 
-  // Define and display a test chart.
+  /**
+   * Create an options array of available fields from this view.
+   */
+  function aggregated_field_options() {
+    $field_names = array();
+    $handlers = $this->display->handler->get_handlers('field');
+    foreach ($handlers as $field => $handler) {
+      if ($label = $handler->label()) {
+        $field_names[$field] = $label;
+      }
+      else {
+        $field_names[$field] = $handler->ui_name();
+      }
+    }
+    return $field_names;
+  }
+
+  /**
+   * Make sure calc_fields is always an array, even when not multiple.
+   */
+  function calc_fields() {
+    $calc_fields = (array) $this->options['calc_fields'];
+    return array_values($calc_fields);
+  }
+
+  /**
+   * Define and display a chart from the grouped values.
+   */
   function render() {
     // Scan all Views data and insert them into a series.
-
-    if ($this->options['conversion'] == 'rows') {
-      // Get columns.
-      foreach ($this->view->field as $key => $field) {
-        if ($this->view->field[$key]->options['label'] == 'chart label') {
-          $chart_label_column = $key;
-          continue;
-        }
-        if (!$field->options['exclude']) {
-          $data[$key]['#legend'] = ($this->options['show_legend']) ? $field->options['label'] : NULL;
-        }
-      }
-
-      // Get values from rows.
-      foreach ($this->view->result as $index => $row) {
-        if (!isset($chart_label_column)) {
-          $label = $index;
-        }
-        foreach ($this->view->field as $key => $field) {
-          if ($chart_label_column == $key) {
-            $label = theme_views_view_field($this->view, $this->view->field[$key], $row);
-            continue;
-          }
-          if ($this->view->field[$key]->options['exclude']) {
-            continue;
-          }
-          $field_alias = $this->view->field[$key]->field_alias;
-          if (isset($this->view->result[$index]->$field_alias)) {
-            // Try to get the value from the result.
-            $field_value = $this->view->result[$index]->$field_alias;
-          }
-          else {
-            // Try to get the value with theme function.
-            $field_value = theme_views_view_field($this->view, $this->view->field[$key], $row);
-          }
-          if (is_numeric($field_value)) {
-            $data[$key][$index]['#value'] = $field_value;
-            $data[$key][$index]['#label'] = $label;
-          }
-        }
-      }
-    }
-
-
-    if ($this->options['conversion'] == 'sum') {
-      // Get fields.
-      foreach ($this->view->field as $key => $field) {
-        if (!$this->view->field[$key]->options['exclude']) {
-          $data[$key]['#legend'] = ($this->options['show_legend']) ? $this->view->field[$key]->options['label'] : NULL;
-        }
-      }
-
-      // Get values from rows.
-      foreach ($this->view->result as $row) {
-        foreach ($this->view->field as $key => $field) {
-          if ($this->view->field[$key]->options['exclude']) {
-            continue;
-          }
-          $field_value = theme_views_view_field($this->view, $this->view->field[$key], $row);
-          if (!isset($data[$key][$field_value]['#value'])) {
-            $data[$key][$field_value]['#label'] = $field_value;
-            $data[$key][$field_value]['#value'] = 1;
-          }
-          else {
-            $data[$key][$field_value]['#value']++;
-          }
-        }
-      }
-
-      // Convert index, because Charts module only accepts numeric index on series.
-      // Don't really understund why is this restriction.
-      foreach ($data as $key => $series) {
-        $index = 0;
-        foreach ($series as $key2 => $value) {
-          if ($key2 == '#legend') {
-            continue;
-          }
-          $data[$key][$index] = $value;
-          unset($data[$key][$key2]);
-          $index++;
-        }
-      }
-
-    }
-
 
     // Get chart settings from options form.
     $chart = array(
@@ -169,18 +158,75 @@ class charts_plugin_style_chart extends views_plugin_style {
       '#height' => $this->options['height'],
       '#width'  => $this->options['width'],
       '#color'  => $this->options['color'],
+      '#title'  => $this->view->get_title(),
     );
 
-    // Use the view title as the chart title.
-    $chart['#title'] = $this->view->get_title();
-
-    // Insert series into the chart array.
-    foreach ($data as $series) {
-      $chart[] = $series;
+    // Get values from rows.
+    foreach ($this->calc_fields() as $calc) {
+      foreach ($this->view->result as $row) {
+        foreach ($this->view->field as $key => $field) {
+          if ($key == $this->options['aggregation_field']) {
+            $legend_field = array_key_exists($calc, $this->view->field) ? $this->view->field[$calc] : NULL;
+            $legend = !empty($legend_field->options['label']) ? $legend_field->options['label'] : NULL;
+            if ($this->options['show_legend']) {
+              $data[$calc]['#legend'] = $legend;
+            }
+            $value['#label'] = strip_tags(theme_views_view_field($this->view, $this->view->field[$key], $row)); // .': '. $row->$calc;
+            $value['#value'] = $row->$calc;
+            $chart[$calc][] = $value;
+          }
+        }
+      }
     }
 
     // Print the chart.
     return charts_chart($chart);
   }
-}
 
+  /**
+   * Custom SQL query change.
+   */
+  function query() {
+    parent::query();
+
+    // Clear the fields out, we'll replace them with calculated values.
+    $this->view->query->clear_fields();
+    // Clear out any sorting, it can create unexpected results
+    // when Views adds aggregation values for the sorts.
+    $this->view->query->orderby = array();
+
+    // Add the grouping information to the query.
+    // Field setting of array('aggregate' => TRUE) tells Views not to force
+    // another aggregation in for this field.
+
+    foreach ($this->view->field as $field) {
+      $query_field = substr($field->field, 0, 3) == 'cid' ? $field->definition['calc'] : $field->table .'.'. $field->field;
+      $query_alias = $field->field_alias;
+
+      // Add the aggregation.
+      if ($field->field == $this->options['aggregation_field']) {
+        $this->view->query->add_orderby(NULL, NULL, 'asc', $query_alias);
+        $this->view->query->add_groupby($query_field);
+        if (substr($field->field, 0, 3) == 'cid') {
+          $this->view->query->add_field(NULL, $query_field, $field->field, array('aggregate' => TRUE));
+        }
+        else {
+          $this->view->query->add_field($field->table, $field->field, NULL, array('aggregate' => TRUE));
+        }
+      }
+      // Add computed values.
+      if (in_array($field->field, $this->calc_fields())) {
+        $sql = "ROUND(". $this->options['calc'] ."($query_field), ". $this->options['precision'] .")";
+        $this->view->query->add_field(NULL, $sql, $field->field, array('aggregate' => TRUE));
+
+        // TODO This part is not relationship-safe, needs additional work
+        // to join in the right table if the computation is done
+        // on a field that comes from a relationship.
+
+        // Make sure the table with the right alias name is available
+        // (it might have been dropped during Views optimizations.)
+        $this->view->query->add_table($field->table);
+      }
+    }
+  }
+}
