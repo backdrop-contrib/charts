@@ -131,7 +131,7 @@ function _charts_module_invoke_all() {
     if (isset($result) && is_array($result)) {
       $return += $result;
     }
-    else if (isset($result)) {
+    elseif (isset($result)) {
       $return[] = $result;
     }
   }

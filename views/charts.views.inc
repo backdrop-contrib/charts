@@ -1,10 +1,16 @@
 <?php
+// $Id$
+/**
+ * @author Bruno Massa http://drupal.org/user/67164
+ * @file
+ * Vinews integration with Charts.
+ */
 
 /**
-* Implementation of hook_views_plugins().
-*
-* Define charts style for Views.
-*/
+ * Implementation of hook_views_plugins().
+ *
+ * Define charts style for Views.
+ */
 function charts_views_plugins() {
   return array(
     'module' => 'charts',
