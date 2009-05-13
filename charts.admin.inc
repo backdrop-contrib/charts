@@ -68,19 +68,6 @@ function _charts_color_form(&$form, $settings) {
 }
 
 /**
- * List all preset color palette
- */
-function _charts_color_palette() {
-  return array(
-    '' => t('Custom'),
-    '#ff0000,#00cc00,#0066b3,#ff8000,#ffcc00,#330099,#990099,#ccff00' => t('Primary'),
-    '#ff6600,#009999,#1919b3,#ffb200,#ffff00,#660099,#e60066,#33ff00' => t('Secondary'),
-//     'ff0000,00cc00,0066b3,ff8000,ffcc00,330099,990099,ccff00' => t('Primary'),
-//     'ff6600,009999,1919b3,ffb200,ffff00,660099,e60066,33ff00' => t('Secondary'),
-  );
-}
-
-/**
  * Generate a generic chart example
  *
  * @param $data
@@ -142,9 +129,9 @@ function _charts_module_invoke_all() {
  *
  * @ingroup form
  */
-function _charts_settings_form($example = FALSE, $color_full = FALSE, $use_default = FALSE) {
+function _charts_settings_form(&$form, $default = array(), $example = FALSE, $color_full = FALSE, $use_default = FALSE) {
   module_load_include('inc', 'charts');
-  $settings = _charts_settings();
+  $default = $default + _charts_settings();
 
   if ($example) {
     $form['chart_example'] = array(
@@ -152,31 +139,31 @@ function _charts_settings_form($example = FALSE, $color_full = FALSE, $use_defau
     );
   }
 
-  asort($settings['#plugins']);
+  asort($default['plugins']);
   $form['plugin'] = array(
-    '#default_value'  => $settings['#plugin'],
-    '#options'        => $settings['#plugins'],
+    '#default_value'  => $default['plugin'],
+    '#options'        => $default['plugins'],
     '#type'           => 'select',
     '#title'          => t('Chart plugin'),
   );
 
-  asort($settings['#types']);
+  asort($default['types']);
   $form['type'] = array(
-    '#default_value'  => $settings['#type'],
-    '#options'        => $settings['#types'],
+    '#default_value'  => $default['type'],
+    '#options'        => $default['types'],
     '#type'           => 'radios',
     '#title'          => t('Chart type'),
   );
 
   $form['width'] = array(
-    '#default_value'  => $settings['#width'],
+    '#default_value'  => $default['width'],
     '#description'    => t('The chart width, in pixels'),
     '#size'           => 8,
     '#type'           => 'textfield',
     '#title'          => t('Width'),
   );
   $form['height'] = array(
-    '#default_value'  => $settings['#height'],
+    '#default_value'  => $default['height'],
     '#description'    => t('The chart height, in pixels'),
     '#size'           => 8,
     '#type'           => 'textfield',
@@ -184,14 +171,14 @@ function _charts_settings_form($example = FALSE, $color_full = FALSE, $use_defau
   );
 
   if ($color_full) {
-    _charts_color_form($form, $settings);
+    _charts_color_form($form, $default);
   }
   else {
     $form['color_palette'] = array(
       '#type'           => 'select',
       '#title'          => t('Color set'),
-      '#options'        => $settings['#color_palettes'],
-      '#default_value'  => $settings['#color_palette'],
+      '#options'        => $default['color_palettes'],
+      '#default_value'  => $default['color_palette'],
     );
   }
 
@@ -205,7 +192,8 @@ function _charts_settings_form($example = FALSE, $color_full = FALSE, $use_defau
  * @ingroup form
  */
 function _charts_settings_page() {
-  $form = _charts_settings_form(TRUE, TRUE);
+  $form = array();
+  _charts_settings_form($form, array(), TRUE, TRUE);
 
   $form['submit'] = array(
     '#type'           => 'submit',
@@ -231,19 +219,12 @@ function _charts_settings_page_submit(&$form, &$form_state) {
   unset($settings['form_token']);
   unset($settings['op']);
 
-  // Add a '#' in all field names, as they will be used like a
-  // Form API field attributes
-  foreach ($settings as $index => $value) {
-    $settings["#$index"] = $value;
-    unset($settings[$index]);
-  }
-
   // Save the Color palette. Firts, filter the data, cluster the results
   // into a single string. Finally, unset all field values, since they
   // are useless
-  $settings['#color_palette'] = implode(',', $settings['#palette']);
-  unset($settings['#palette']);
-  unset($settings['#scheme']);
+  $settings['color_palette'] = implode(',', $settings['palette']);
+  unset($settings['palette']);
+  unset($settings['scheme']);
 
   // Save the data into database
   variable_set('charts_settings', $settings);
