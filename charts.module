@@ -42,7 +42,7 @@ function charts_chart_types() {
  */
 function charts_menu() {
   $items['admin/settings/charts'] = array(
-    'access arguments'  => array('access administration pages'),
+    'access arguments'  => array('set default settings for charts'),
     'description'     => 'Set the default behaviour and look of all your charts',
     'file'            => 'charts.admin.inc',
     'page callback'   => 'drupal_get_form',
@@ -50,6 +50,13 @@ function charts_menu() {
     'title'           => 'Charts'
   );
   return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function charts_perm() {
+  return array('set default settings for charts');
 }
 
 /**
