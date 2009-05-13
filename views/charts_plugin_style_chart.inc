@@ -17,10 +17,10 @@ class charts_plugin_style_chart extends views_plugin_style {
    * Set default options.
    */
   function options(&$options) {
-    $options['format']            = 'pie2D';
-    $options['height']            = 200;
-    $options['width']             = 400;
-    $options['color']             = 'ffffff';
+    // Get the default chart values
+    module_load_include('inc', 'charts');
+    $options['charts'] = _charts_settings();
+
     $options['aggregation_field'] = '';
     $options['calc_fields']       = array();
     $options['calc']              = 'COUNT';
@@ -33,41 +33,11 @@ class charts_plugin_style_chart extends views_plugin_style {
   function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
 
-    $form['format'] = array(
-      '#type'    => 'select',
-      '#title'   => t('Chart format'),
-      '#options'       => array(
-        'line2D'  => t('Line 2D'),
-        'hbar2D'  => t('Horizontal Bar 2D'),
-        'vbar2D'  => t('Vertical Bar 2D'),
-        'pie2D'   => t('Pie 2D'),
-        'pie3D'   => t('Pie 3D'),
-        'venn'    => t('Venn'),
-        'scatter' => t('Scatter Plot')
-      ),
-      '#default_value' => $this->options['format'],
-    );
-    $form['height'] = array(
-      '#type'           => 'textfield',
-      '#title'          => t('Chart height'),
-      '#default_value'  => $this->options['height'],
-      '#required'       => TRUE, // Google charts breaks if it is empty.
-      '#description'    => t('An integer value, the number of pixels of height for this chart.'),
-    );
-    $form['width'] = array(
-      '#type'           => 'textfield',
-      '#title'          => t('Chart width'),
-      '#default_value'  => $this->options['width'],
-      '#required'       => TRUE, // Google charts breaks if it is empty.
-      '#description'    => t('An integer value, the number of pixels of width for this chart.'),
-    );
-    $form['color'] = array(
-      '#type'           => 'textfield',
-      '#title'          => t('Background color'),
-      '#default_value'  => $this->options['color'],
-      '#description'    => t('In hexadecimal format (RRGGBB). Do not use the # symbol.'),
-      '#required'       => TRUE, // Google charts breaks if it is empty.
-    );
+    // Add the Chart Settings form
+    module_load_include('admin.inc', 'charts');
+    $form['charts']['#tree'] = TRUE;
+    _charts_settings_form($form['charts'], $this->options['charts']);
+
     $form['show_legend'] = array(
       '#type'           => 'checkbox',
       '#title'          => t('Show legend'),
@@ -75,6 +45,7 @@ class charts_plugin_style_chart extends views_plugin_style {
       '#description'    => t('Display legend next to the chart.'),
     );
 
+    // Views Calc related fields
     $form['aggregation_field'] = array(
       '#type'           => 'select',
       '#title'          => t('Aggregation field'),
@@ -150,16 +121,10 @@ class charts_plugin_style_chart extends views_plugin_style {
    * Define and display a chart from the grouped values.
    */
   function render() {
-    // Scan all Views data and insert them into a series.
-
     // Get chart settings from options form.
-    $chart = array(
-      '#type'   => $this->options['format'],
-      '#height' => $this->options['height'],
-      '#width'  => $this->options['width'],
-      '#color'  => $this->options['color'],
-      '#title'  => $this->view->get_title(),
-    );
+    foreach ($this->options['charts'] as $index => $value) {
+      $chart['#'. $index] = $value;
+    }
 
     // Get values from rows.
     foreach ($this->calc_fields() as $calc) {
