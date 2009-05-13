@@ -12,59 +12,57 @@
  *
  * @ingroup from
  */
-function _charts_color_form(&$form, $settings) {
-  // The Color module integration starts with a field set
+function _charts_color_form_complete(&$form, $default) {
+  // Use ColorPicker module if possible
+  $field_type = module_exists('colorpicker') ? 'colorpicker_textfield' : 'textfield';
+
   $form['color'] = array(
-    '#attributes'     => array('id' => 'charts_color', 'class' => ' clear-block'),
-    '#collapsible'    => TRUE,
     '#type'           => 'fieldset',
-    '#theme'          => 'charts_settings_color',
     '#title'          => t('Color'),
+    '#tree'           => TRUE
   );
-
-  // Load some color palettes
-  $form['color']['scheme'] = array(
+  $form['color']['color_palettes'] = array(
     '#type'           => 'select',
-    '#title'          => t('Color set'),
-    '#options'        => $settings['#color_palettes'],
-    '#default_value'  => $settings['#color_palette'],
+    '#title'          => t('Color palettes'),
+    '#options'        => $default['color_palettes'],
+    '#default_value'  => $default['color_palette'],
   );
-
-  // Add palette fields. Since all
-  $color_palette = explode(',', $settings['#color_palette']);
-
-  $names = array(
-    t('Color %number', array('%number' => 1)),
-    t('Color %number', array('%number' => 2)),
-    t('Color %number', array('%number' => 3)),
-    t('Color %number', array('%number' => 4)),
-    t('Color %number', array('%number' => 5)),
-    t('Color %number', array('%number' => 6)),
-    t('Color %number', array('%number' => 7)),
-    t('Color %number', array('%number' => 8)),
+  $form['color']['background'] = array(
+    '#type'           => $field_type,
+    '#title'          => t('Background'),
+    '#default_value'  => $default['color']['background'],
+//     '#colorpicker'    => 'colorpicker',
   );
-  $form['color']['palette'] = array(
-    '#prefix'           => '<div id="preview"></div><div id="farbtastic"></div><div id="palette" class="clear-block">',
-    '#suffix'           => '</div>',
-    '#tree'             => TRUE,
+  $form['color']['text'] = array(
+    '#type'           => $field_type,
+    '#title'          => t('Text'),
+    '#default_value'  => $default['color']['text'],
   );
-  foreach ($names as $color => $value) {
-    $form['color']['palette']['color'. $color] = array(
-      '#type'           => 'textfield',
-      '#title'          => $value,
-      '#default_value'  => empty($color_palette[$color]) ? '336699' : $color_palette[$color],
-      '#size'           => 8,
+  for ($series = 0; $series < 8; $series++) {
+    $form['color'][$series] = array(
+      '#type'           => $field_type,
+      '#title'          => t('Series %serie', array('%serie' => $series + 1)),
+      '#default_value'  => $default['color'][$series],
     );
-    $color_palette['color'. $color] = $color_palette[$color];
-    unset($color_palette[$color]);
   }
-  $form['color']['farbtastic'] = array(
-    '#prefix'          => '<div id="farbtastic">',
-    '#sufix'           => '</div>',
-  );
 
-  // Add the necessary JS data into the page
-  drupal_add_js(array('charts_color' => array('reference' => $color_palette)), 'setting');
+  drupal_add_js(drupal_get_path('module', 'charts') .'/charts_color.js');
+  drupal_add_js(array('chartsColorCustom' => t('Custom')), 'setting');
+}
+
+/**
+ * Subform that use simple color inputs.
+ *
+ * @ingroup from
+ */
+function _charts_color_form_simple(&$form, $settings) {
+  // Load some color palettes
+  $form['color_palettes'] = array(
+    '#type'           => 'select',
+    '#title'          => t('Color palettes'),
+    '#options'        => $settings['color_palettes'],
+    '#default_value'  => $settings['color_palette'],
+  );
 }
 
 /**
@@ -129,13 +127,14 @@ function _charts_module_invoke_all() {
  *
  * @ingroup form
  */
-function _charts_settings_form(&$form, $default = array(), $example = FALSE, $color_full = FALSE, $use_default = FALSE) {
+function _charts_settings_form(&$form, $default = array(), $options = array()) {
   module_load_include('inc', 'charts');
   $default = $default + _charts_settings();
+  $options = array_fill_keys($options, TRUE);
 
-  if ($example) {
+  if (!empty($options['example'])) {
     $form['chart_example'] = array(
-      '#value'          => _charts_example(),
+      '#value'          => _charts_example($default),
     );
   }
 
@@ -170,16 +169,11 @@ function _charts_settings_form(&$form, $default = array(), $example = FALSE, $co
     '#title'          => t('Height'),
   );
 
-  if ($color_full) {
-    _charts_color_form($form, $default);
+  if (empty($options['color_complete'])) {
+    _charts_color_form_simple($form, $default);
   }
   else {
-    $form['color_palette'] = array(
-      '#type'           => 'select',
-      '#title'          => t('Color set'),
-      '#options'        => $default['color_palettes'],
-      '#default_value'  => $default['color_palette'],
-    );
+    _charts_color_form_complete($form, $default);
   }
 
   return $form;
@@ -193,7 +187,7 @@ function _charts_settings_form(&$form, $default = array(), $example = FALSE, $co
  */
 function _charts_settings_page() {
   $form = array();
-  _charts_settings_form($form, array(), TRUE, TRUE);
+  _charts_settings_form($form, array(), array('example', 'color_complete'));
 
   $form['submit'] = array(
     '#type'           => 'submit',
@@ -228,22 +222,4 @@ function _charts_settings_page_submit(&$form, &$form_state) {
 
   // Save the data into database
   variable_set('charts_settings', $settings);
-}
-
-/**
- * Theme color form.
- *
- * @ingroup @themeable
- */
-function theme_charts_settings_color($form) {
-  // Add Farbtastic color picker JS
-  drupal_add_css('misc/farbtastic/farbtastic.css', 'module', 'all', FALSE);
-  drupal_add_js('misc/farbtastic/farbtastic.js');
-  drupal_add_js(drupal_get_path('module', 'charts') .'/charts_color.js');
-
-  // Add the necessary CSS
-  drupal_add_css(drupal_get_path('module', 'charts') .'/charts_color.css');
-
-  // Preview and the rest of the form
-  return '<div id="preview"></div>'. drupal_render($form);
 }

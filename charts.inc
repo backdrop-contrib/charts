@@ -116,8 +116,13 @@ function _charts_settings() {
     // Color Palette
     $settings['color_palettes'] = _charts_settings_color_palette();
     if (empty($settings['color_palette'])) {
-      $settings['color_palette'] = '0,0,0,0,0,0,0,0';
+      $settings['color_palette'] = current(array_keys($settings['color_palettes']));
     }
+
+    // Color
+    $settings['color'] = explode( ',', $settings['color_palette']);
+    $settings['color']['background'] = array_shift($settings['color']);
+    $settings['color']['text']       = array_shift($settings['color']);
   }
 
   return $settings;
@@ -128,10 +133,8 @@ function _charts_settings() {
  */
 function _charts_settings_color_palette() {
   return array(
+    '#ffffff,#000000,#ff0000,#00cc00,#0066b3,#ff8000,#ffcc00,#330099,#990099,#ccff00' => t('Primary'),
+    '#ffffff,#000000,#ff6600,#009999,#1919b3,#ffb200,#ffff00,#660099,#e60066,#33ff00' => t('Secondary'),
     '' => t('Custom'),
-    '#ff0000,#00cc00,#0066b3,#ff8000,#ffcc00,#330099,#990099,#ccff00' => t('Primary'),
-    '#ff6600,#009999,#1919b3,#ffb200,#ffff00,#660099,#e60066,#33ff00' => t('Secondary'),
-//     'ff0000,00cc00,0066b3,ff8000,ffcc00,330099,990099,ccff00' => t('Primary'),
-//     'ff6600,009999,1919b3,ffb200,ffff00,660099,e60066,33ff00' => t('Secondary'),
   );
 }
