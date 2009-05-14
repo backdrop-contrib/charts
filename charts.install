@@ -12,18 +12,3 @@
 function charts_uninstall() {
   variable_del('charts_settings');
 }
-
-/**
- * Implementation of hook_update().
- *
- * Convert all settings into 'index' => value instead '#index' => value
- */
-function charts_update_6001() {
-  $settings = variable_get('charts_settings', array());
-  foreach ($settings as $index => $value) {
-    $settings_new[substr($index, 1)] = $value;
-  }
-  variable_set('charts_settings', $settings);
-
-  return array();
-}

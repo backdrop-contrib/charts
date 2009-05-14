@@ -24,25 +24,25 @@ function _charts_color_form_complete(&$form, $default) {
   $form['color']['color_palettes'] = array(
     '#type'           => 'select',
     '#title'          => t('Color palettes'),
-    '#options'        => $default['color_palettes'],
-    '#default_value'  => $default['color_palette'],
+    '#options'        => $default['#color_palettes'],
+    '#default_value'  => $default['#color_palette'],
   );
   $form['color']['background'] = array(
     '#type'           => $field_type,
     '#title'          => t('Background'),
-    '#default_value'  => $default['color']['background'],
+    '#default_value'  => $default['#color']['background'],
 //     '#colorpicker'    => 'colorpicker',
   );
   $form['color']['text'] = array(
     '#type'           => $field_type,
     '#title'          => t('Text'),
-    '#default_value'  => $default['color']['text'],
+    '#default_value'  => $default['#color']['text'],
   );
   for ($series = 0; $series < 8; $series++) {
     $form['color'][$series] = array(
       '#type'           => $field_type,
       '#title'          => t('Series %serie', array('%serie' => $series + 1)),
-      '#default_value'  => $default['color'][$series],
+      '#default_value'  => $default['#color'][$series],
     );
   }
 
@@ -60,8 +60,8 @@ function _charts_color_form_simple(&$form, $settings) {
   $form['color_palettes'] = array(
     '#type'           => 'select',
     '#title'          => t('Color palettes'),
-    '#options'        => $settings['color_palettes'],
-    '#default_value'  => $settings['color_palette'],
+    '#options'        => $settings['#color_palettes'],
+    '#default_value'  => $settings['#color_palette'],
   );
 }
 
@@ -73,8 +73,8 @@ function _charts_color_form_simple(&$form, $settings) {
  * @return
  *   HTML. The generic Chart example
  */
-function _charts_example($data = array()) {
-  if (empty($data)) {
+function _charts_example() {
+//   if (empty($data)) {
     // This will hold the example chart
     // Since the chart is an example, we should provide
     // and example data.
@@ -92,7 +92,7 @@ function _charts_example($data = array()) {
       10, 20, 55, 72, 45, 50
     );
     $data['#title'] = 'Testing Chart';
-  }
+//   }
   return charts_chart($data);
 }
 
@@ -130,39 +130,40 @@ function _charts_module_invoke_all() {
 function _charts_settings_form(&$form, $default = array(), $options = array()) {
   module_load_include('inc', 'charts');
   $default = $default + _charts_settings();
+
   $options = array_fill_keys($options, TRUE);
 
   if (!empty($options['example'])) {
     $form['chart_example'] = array(
-      '#value'          => _charts_example($default),
+      '#value'          => _charts_example(),
     );
   }
 
-  asort($default['plugins']);
+  asort($default['#plugins']);
   $form['plugin'] = array(
-    '#default_value'  => $default['plugin'],
-    '#options'        => $default['plugins'],
+    '#default_value'  => $default['#plugin'],
+    '#options'        => $default['#plugins'],
     '#type'           => 'select',
     '#title'          => t('Chart plugin'),
   );
 
-  asort($default['types']);
+  asort($default['#types']);
   $form['type'] = array(
-    '#default_value'  => $default['type'],
-    '#options'        => $default['types'],
+    '#default_value'  => $default['#type'],
+    '#options'        => $default['#types'],
     '#type'           => 'radios',
     '#title'          => t('Chart type'),
   );
 
   $form['width'] = array(
-    '#default_value'  => $default['width'],
+    '#default_value'  => $default['#width'],
     '#description'    => t('The chart width, in pixels'),
     '#size'           => 8,
     '#type'           => 'textfield',
     '#title'          => t('Width'),
   );
   $form['height'] = array(
-    '#default_value'  => $default['height'],
+    '#default_value'  => $default['#height'],
     '#description'    => t('The chart height, in pixels'),
     '#size'           => 8,
     '#type'           => 'textfield',
@@ -216,10 +217,15 @@ function _charts_settings_page_submit(&$form, &$form_state) {
   // Save the Color palette. Firts, filter the data, cluster the results
   // into a single string. Finally, unset all field values, since they
   // are useless
-  $settings['color_palette'] = implode(',', $settings['palette']);
-  unset($settings['palette']);
-  unset($settings['scheme']);
+  $settings['color_palette'] = implode(',', $settings['color']);
+
+  // Include a # sign in all attributes, because it will make the
+  // merge between the chart data and the defaults easier on every
+  // chart display.
+  foreach ($settings as $index => $value) {
+    $default['#'. $index] = $value;
+  }
 
   // Save the data into database
-  variable_set('charts_settings', $settings);
+  variable_set('charts_settings', $default);
 }

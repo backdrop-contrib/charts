@@ -18,34 +18,34 @@
  */
 function _charts_chart(&$data) {
   // Get the previously saved data from database
-  $settings = _charts_settings();
+  $data = $data + _charts_settings();
 
-  if (empty($data['#plugin']) and empty($settings['plugin'])) {
+  if (empty($data['#plugin']) and empty($default['#plugin'])) {
     return '';
   }
 
   // Split the color palette data into inidividual values
-  $color_palette = explode(',', ereg_replace('#', '', $settings['color_palette']));
+  $color_palette = explode(',', ereg_replace('#', '', $default['#color_palette']));
 
   // Check if the Chart will use the color palette for individual values
   // instead for series, like Pie Charts
   $options = array('pie2D' => TRUE, 'pie3D' => TRUE);
   if ((!empty($data['#type']) and !empty($options[$data['#type']]) ) or
-      (!empty($settings['type']) and !empty($options[$settings['type']]) ) ) {
+      (!empty($default['#type']) and !empty($options[$default['#type']]) ) ) {
     $individual_color_palette = TRUE;
   }
 
   // Merge all series option to the main data array,
   foreach (element_children($data) as $series) {
-    if (!empty($settings[$series])) {
-      $data[$series] = array_merge($settings[$series], $data[$series]);
+    if (!empty($default[$series])) {
+      $data[$series] = array_merge($default[$series], $data[$series]);
     }
-    unset($settings[$series]);
+    unset($default[$series]);
 
     // Apply the Color Palette: normally, apply one color to each series.
     // But for some types of charts, is one color to each value into the series
     if (empty($individual_color_palette) and empty($data[$series]['#color'])) {
-      $data[$series]['color'] = $color_palette[$series];
+      $data[$series]['#color'] = $color_palette[$series];
     }
     elseif (!empty($individual_color_palette)) {
       foreach (element_children($data[$series]) as $values) {
@@ -86,46 +86,46 @@ function _charts_chart(&$data) {
  */
 function _charts_settings() {
   // Get the previously saved data from Data Base
-  static $settings, $filtered = array();
+  static $default = array();
 
-  if (empty($settings)) {
-    $settings = variable_get('charts_settings', array());
+  if (empty($default)) {
+    $default = variable_get('charts_settings', array());
 
     // Plugin
     $charts_info = module_invoke_all('charts_info', 'list');
     foreach ($charts_info as $chart_code => $chart) {
-      $settings['plugins'][$chart_code] = $chart['name'];
+      $default['#plugins'][$chart_code] = $chart['name'];
     }
-    asort($settings['plugins']);
-    $settings['plugin'] = empty($settings['plugin']) ? current(array_keys($settings['plugins'])) : $settings['plugin'];
+    asort($default['#plugins']);
+    $default['#plugin'] = empty($default['#plugin']) ? current(array_keys($default['#plugins'])) : $default['#plugin'];
 
     // Type
-    $settings['types'] = module_invoke_all('chart_types');
-    $ctypes_allowed = array_fill_keys($charts_info[$settings['plugin']]['types'], TRUE);
-    foreach (array_keys($settings['types']) as $ctype_code) {
+    $default['#types'] = module_invoke_all('chart_types');
+    $ctypes_allowed = array_fill_keys($charts_info[$default['#plugin']]['types'], TRUE);
+    foreach (array_keys($default['#types']) as $ctype_code) {
       if (empty($ctypes_allowed[$ctype_code])) {
-        unset($settings['types'][$ctype_code]);
+        unset($default['#types'][$ctype_code]);
       }
     }
-    $settings['type']  = empty($settings['type']) ? current(array_keys($settings['types'])) : $settings['type'];
+    $default['#type']  = empty($default['#type']) ? current(array_keys($default['#types'])) : $default['#type'];
 
     // Width and Height
-    $settings['width']  = empty($settings['width'])  ? 400 : $settings['width'];
-    $settings['height'] = empty($settings['height']) ? 200 : $settings['height'];
+    $default['#width']  = empty($default['#width'])  ? 400 : $default['#width'];
+    $default['#height'] = empty($default['#height']) ? 200 : $default['#height'];
 
     // Color Palette
-    $settings['color_palettes'] = _charts_settings_color_palette();
-    if (empty($settings['color_palette'])) {
-      $settings['color_palette'] = current(array_keys($settings['color_palettes']));
+    $default['#color_palettes'] = _charts_settings_color_palette();
+    if (empty($default['#color_palette'])) {
+      $default['#color_palette'] = current(array_keys($default['#color_palettes']));
     }
 
     // Color
-    $settings['color'] = explode( ',', $settings['color_palette']);
-    $settings['color']['background'] = array_shift($settings['color']);
-    $settings['color']['text']       = array_shift($settings['color']);
+    $default['#color'] = explode( ',', $default['#color_palette']);
+    $default['#color']['background'] = array_shift($default['#color']);
+    $default['#color']['text']       = array_shift($default['#color']);
   }
 
-  return $settings;
+  return $default;
 }
 
 /**
