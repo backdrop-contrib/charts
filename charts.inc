@@ -18,54 +18,36 @@
  */
 function _charts_chart(&$data) {
   // Get the previously saved data from database
-  $data = $data + _charts_settings();
-
-  if (empty($data['#plugin']) and empty($default['#plugin'])) {
-    return '';
-  }
-
-  // Split the color palette data into inidividual values
-  $color_palette = explode(',', ereg_replace('#', '', $default['#color_palette']));
+  $settings = _charts_settings();
 
   // Check if the Chart will use the color palette for individual values
-  // instead for series, like Pie Charts
+  // instead for series, like Pie charts
   $options = array('pie2D' => TRUE, 'pie3D' => TRUE);
-  if ((!empty($data['#type']) and !empty($options[$data['#type']]) ) or
-      (!empty($default['#type']) and !empty($options[$default['#type']]) ) ) {
-    $individual_color_palette = TRUE;
+  if ((!empty($data['#type']) and !empty($options[$data['#type']])) or !empty($options[$settings['#type']])) {
+    $invert_attributes = TRUE;
   }
 
-  // Merge all series option to the main data array,
+  // Merge deafult series attributes with data
   foreach (element_children($data) as $series) {
-    if (!empty($default[$series])) {
-      $data[$series] = array_merge($default[$series], $data[$series]);
-    }
-    unset($default[$series]);
-
-    // Apply the Color Palette: normally, apply one color to each series.
-    // But for some types of charts, is one color to each value into the series
-    if (empty($individual_color_palette) and empty($data[$series]['#color'])) {
-      $data[$series]['#color'] = $color_palette[$series];
-    }
-    elseif (!empty($individual_color_palette)) {
-      foreach (element_children($data[$series]) as $values) {
-        if (!is_array($data[$series][$values])) {
-          $data[$series][$values] = array(
-            '#value' => $data[$series][$values],
-            '#color' => $color_palette[$values],
-          );
-        }
-        elseif (empty($data[$series][$values]['#color'])) {
-          $data[$series][$values]['#color'] = $color_palette[$values];
-        }
+    foreach (element_children($data[$series]) as $value) {
+      if (!is_array($data[$series][$value])) {
+        $data[$series][$value] = array(
+          '#value' => $data[$series][$value]
+        );
+      }
+      if (!empty($invert_attributes)) {
+        _chart_series_attributes($data[$series][$value], $value, $settings);
       }
     }
+    if (empty($invert_attributes)) {
+      _chart_series_attributes($data[$series], $series, $settings);
+    }
   }
+  $data += $settings;
 
-  // Get the information about chart modules
-  $chart_provider = module_invoke_all('charts_info');
-
-  if (isset($chart_provider[$data['#plugin']]['file'])
+  if (!empty($data['#plugin'])
+      and $chart_provider = module_invoke_all('charts_info')
+      and isset($chart_provider[$data['#plugin']]['file'])
       and is_file($chart_provider[$data['#plugin']]['file'])
       and $func = $chart_provider[$data['#plugin']]['render']) {
 
@@ -76,6 +58,15 @@ function _charts_chart(&$data) {
     return $func($data);
   }
   return '';
+}
+
+/**
+ * Merge the default series attributes with the actual data.
+ */
+function _chart_series_attributes(&$data, &$value, &$settings) {
+  foreach ($settings['#series_attributes'] as $attribute) {
+    $data[$attribute] = $settings[$attribute][$value];
+  }
 }
 
 /**
@@ -123,6 +114,7 @@ function _charts_settings() {
     $default['#color'] = explode( ',', $default['#color_palette']);
     $default['#color']['background'] = array_shift($default['#color']);
     $default['#color']['text']       = array_shift($default['#color']);
+    $default['#series_attributes'][] = '#color';
   }
 
   return $default;
