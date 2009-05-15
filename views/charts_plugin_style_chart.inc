@@ -19,7 +19,11 @@ class charts_plugin_style_chart extends views_plugin_style {
   function options(&$options) {
     // Get the default chart values
     module_load_include('inc', 'charts');
-    $options['charts'] = _charts_settings();
+    $options['charts']            = _charts_settings();
+
+    // (yet) Non default chartssettings
+    $form['show_legend']          = TRUE;
+    $form['show_sums']            = TRUE;
 
     $options['aggregation_field'] = '';
     $options['calc_fields']       = array();
@@ -44,6 +48,12 @@ class charts_plugin_style_chart extends views_plugin_style {
       '#title'          => t('Show legend'),
       '#default_value'  => $this->options['show_legend'],
       '#description'    => t('Display legend next to the chart.'),
+    );
+    $form['show_sums'] = array(
+      '#type'           => 'checkbox',
+      '#title'          => t('Show individual sums'),
+      '#default_value'  => TRUE,
+      '#description'    => t('Display the sum for each column in the chart legends'),
     );
 
     // Views Calc related fields
@@ -146,7 +156,10 @@ class charts_plugin_style_chart extends views_plugin_style {
             if ($this->options['show_legend']) {
               $data[$calc]['#legend'] = $legend;
             }
-            $value['#label'] = strip_tags(theme_views_view_field($this->view, $this->view->field[$key], $row)); // .': '. $row->$calc;
+            $value['#label'] = strip_tags(theme_views_view_field($this->view, $this->view->field[$key], $row));
+            if ($this->options['show_sums']) {
+              $value['#label'] .= ' ('. $row->$calc .')';
+            }
             $value['#value'] = $row->$calc;
             $chart[$calc][] = $value;
           }
