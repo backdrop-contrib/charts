@@ -60,57 +60,6 @@ function charts_perm() {
 }
 
 /**
- * Implementation of hook_requirements().
- */
-function charts_requirements($phase) {
-  if ($phase == 'runtime' and !$modules = module_invoke_all('charts_info', 'list')) {
-    $requirements['charts']['title']        = t('Charts');
-    $requirements['charts']['value']        = t('No Charts provider installed');
-    $requirements['charts']['severity']     = REQUIREMENT_ERROR;
-    $requirements['charts']['description']  = t('Charts core module only provides a a common set of functions. You must install a Charts provider module to create charts.');
-
-    return $requirements;
-  }
-  elseif ($phase == 'runtime' and !$settings = variable_get('charts_settings', array())) {
-    $requirements['charts']['title']        = t('Charts');
-    $requirements['charts']['value']        = t('Charts module not yet configured');
-    $requirements['charts']['severity']     = REQUIREMENT_ERROR;
-    $requirements['charts']['description']  = t('Charts core module needs to get some default options in order to operate. You must go to <a href="!link">settings page</a> and configure it.', array('!link' => url('admin/settings/charts')));
-
-    return $requirements;
-  }
-}
-
-/**
- * Even if the series have values with attributes,
- * return only the numeric values of them.
- *
- * @param
- *   Array. A given data series with or without attributes.
- * @return
- *   Array. A data series, but only with the values, without
- *   the attributes.
- */
-function _charts_series_values($series) {
-  $data = array();
-
-  foreach ($series as $index => $value) {
-    if (!is_numeric($index)) {
-      continue;
-    }
-
-    if (is_array($value)) {
-      $data[] = $value['#value'];
-    }
-    else {
-      $data[] = $value;
-    }
-  }
-
-  return $data;
-}
-
-/**
  * Implementation of hook_theme().
  */
 function charts_theme() {
