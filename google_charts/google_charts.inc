@@ -6,6 +6,19 @@
  * Use Google Charts on your site.
  */
 
+function _google_charts($type) {
+  $types = array(
+    'line2D'  => array('legend' => TRUE, 'typecode' => 'lc', 'value_attributes' => FALSE),
+    'hbar2D'  => array('legend' => TRUE, 'typecode' => 'bhg', 'value_attributes' => FALSE),
+    'vbar2D'  => array('legend' => TRUE, 'typecode' => 'bvg', 'value_attributes' => FALSE),
+    'pie2D'   => array('legend' => FALSE, 'typecode' => 'p', 'value_attributes' => TRUE),
+    'pie3D'   => array('legend' => FALSE, 'typecode' => 'p3', 'value_attributes' => TRUE),
+    'venn'    => array('legend' => TRUE, 'typecode' => 'v', 'value_attributes' => FALSE),
+    'scatter' => array('legend' => FALSE, 'typecode' => 's', 'value_attributes' => FALSE),
+  );
+  return $types[$type];
+}
+
 /**
  * Convert all Chart-level data.
  *
@@ -20,16 +33,8 @@ function _google_charts_chart(&$chart, &$data) {
   // Convert the chat TYPE into the Google Chart way.
   // Since its a requirement to build the chart on Google, if the value
   // was not found, return nothing and stop the execution.
-  $options = array(
-    'line2D'  => 'lc',
-    'hbar2D'  => 'bhg',
-    'vbar2D'  => 'bvg',
-    'pie2D'   => 'p',
-    'pie3D'   => 'p3',
-    'venn'    => 'v',
-    'scatter' => 's',
-  );
-  if (empty($options[$data['#type']])) {
+  $options = _google_charts($data['#type']);
+  if (empty($options['typecode'])) {
     return t('This type is not possible using %chartplugin',
       array('%chartplugin' => 'Google Chart'));
   }
@@ -37,7 +42,7 @@ function _google_charts_chart(&$chart, &$data) {
     $chart[] = 'cht=pc';
   }
   else {
-    $chart[] = 'cht='. $options[$data['#type']];
+    $chart[] = 'cht='. $options['typecode'];
   }
 
   // Convert the chat SIZE into the Google Chart way.
@@ -55,8 +60,8 @@ function _google_charts_chart(&$chart, &$data) {
 
   // Chart background color. Since the default color
   // is white (#ffffff), only different colors are considered
-  if (!empty($data['#color']) and $data['#color'] != '#ffffff') {
-    $chart[] = 'chf=bg,s,'. substr($data['#color'], 1);
+  if (!empty($data['#color']['background']) and $data['#color']['background'] != '#ffffff') {
+    $chart[] = 'chf=bg,s,'. substr($data['#color']['background'], 1);
   }
 
   return;
@@ -126,6 +131,8 @@ function _google_charts_render(&$data) {
  *   String. The string presentation of series data
  */
 function _google_charts_series(&$chart, &$data) {
+  $options = _google_charts($data['#type']);
+
   // The final output is going to be build
   $chart_data = '';
 
@@ -158,7 +165,7 @@ function _google_charts_series(&$chart, &$data) {
 
       $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
 
-      if ($data['#type'] == 'pie2D') {
+      if ($options['value_attributes']) {
         // Series legends
         $legends[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
 
@@ -172,7 +179,7 @@ function _google_charts_series(&$chart, &$data) {
       $value_labels += $value_labels_temp;
     }
 
-    if ($data['#type'] != 'pie2D') {
+    if (empty($options['value_attributes'])) {
       // Series legends
       $legends[] = empty($data[$series]['#legend']) ? NULL : $data[$series]['#legend'];
 
@@ -190,22 +197,17 @@ function _google_charts_series(&$chart, &$data) {
   $chart[] = 'chd=s:'. $chart_data;
 
   // Insert series legend
-  if (!empty($legends)) {
-    $chart[] = 'chdl='. implode('|', $legends);
-  }
-
-  // Insert series legend
   if (!empty($colors)) {
     $chart[] = 'chco='. implode(',', $colors);
   }
 
-  // Insert values legend
+  // Insert values labels
   if (!empty($value_labels)) {
     $chart[] = 'chl='. implode('|', $value_labels);
   }
 
   // Insert multiple series tag
-  if (!empty($legends)) {
+  if ($options['legend'] and !empty($legends)) {
     $chart[] = 'chdl='. implode('|', $legends);
   }
 
