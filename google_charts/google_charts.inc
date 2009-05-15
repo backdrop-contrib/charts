@@ -33,7 +33,12 @@ function _google_charts_chart(&$chart, &$data) {
     return t('This type is not possible using %chartplugin',
       array('%chartplugin' => 'Google Chart'));
   }
-  $chart[] = 'cht='. $options[$data['#type']];
+  if ($data['#type'] == 'pie2D' and count(element_children($data)) > 1) {
+    $chart[] = 'cht=pc';
+  }
+  else {
+    $chart[] = 'cht='. $options[$data['#type']];
+  }
 
   // Convert the chat SIZE into the Google Chart way.
   // Since its a requirement to build the chart on Google, if the value
@@ -134,6 +139,10 @@ function _google_charts_series(&$chart, &$data) {
       $chart_data .= ',';
     }
 
+    if ($data['#type'] == 'pie2D' and !empty($series)) {
+
+    }
+
     // Get only the numeric values from the series
     $series_data = _charts_series_values($data[$series]);
 
@@ -163,12 +172,12 @@ function _google_charts_series(&$chart, &$data) {
       $value_labels += $value_labels_temp;
     }
 
-      if ($data['#type'] != 'pie2D') {
-    // Series legends
-    $legends[] = empty($data[$series]['#legend']) ? NULL : $data[$series]['#legend'];
+    if ($data['#type'] != 'pie2D') {
+      // Series legends
+      $legends[] = empty($data[$series]['#legend']) ? NULL : $data[$series]['#legend'];
 
-    // Series colors
-    $colors[] = empty($data[$series]['#color']) ? NULL : substr($data[$series]['#color'], 1);
+      // Series colors
+      $colors[] = empty($data[$series]['#color']) ? NULL : substr($data[$series]['#color'], 1);
     }
   }
 
@@ -193,6 +202,11 @@ function _google_charts_series(&$chart, &$data) {
   // Insert values legend
   if (!empty($value_labels)) {
     $chart[] = 'chl='. implode('|', $value_labels);
+  }
+
+  // Insert multiple series tag
+  if (!empty($legends)) {
+    $chart[] = 'chdl='. implode('|', $legends);
   }
 
   return;
