@@ -48,7 +48,7 @@ function _charts_system_charts($ctype) {
         FROM {users_roles} ur
         LEFT JOIN {users} u ON ur.uid = u.uid
         LEFT JOIN {role} r ON r.rid = ur.rid
-        GROUP BY r.rid
+        GROUP BY r.rid, r.name
         ORDER BY r.name'
       );
       $output .= _charts_system_generate(
@@ -147,24 +147,22 @@ function _charts_system_node_activity() {
 
   while ($result = db_fetch_array($results)) {
     $day = ltrim(date('d', $result['created']), '0');
-    $types[] = $result['type'];
+    $types[$result['type']] = $type++;
     $counts[$day][$result['type']]++;
   }
 
   // Generate data and labels
   if (!empty($counts)) {
-    for ($i = 1; $i <= date('d', $now); $i++) {
-      foreach ($types as $index => $type) {
-        $chart[$index]['#legend'] = $type;
-        $chart[$index][] = array(
+    foreach ($types as $type => $index) {
+      $chart[$type]['#legend'] = $type;
+      for ($i = 1; $i <= date('d', $now); $i++) {
+        $chart[$type][] = array(
           '#value'  => empty($counts[$i][$type]) ? 0 : $counts[$i][$type],
-          '#label'  => empty($index) ? $i : NULL
+          '#label'  => $i
         );
       }
     }
-  }
 
-  if (!empty($chart)) {
     $chart['#title']    = t('Activity for !date', array('!date' => date('F Y', $now)));
     $chart['#type']     = 'line2D';
 
