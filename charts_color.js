@@ -6,9 +6,9 @@
  */
 Drupal.behaviors.chartsColor = function (context) {
   var chartsColor = function() {
-    var colors = $("#edit-color-color-palettes").val().split(",");
+    var colors = $("#edit-color-color-palette").val().split(",");
     var series = ["background", "text", 0, 1, 2, 3, 4, 5, 6, 7];
-    var disabled = ($("#edit-color-color-palettes").children("option:selected").text() == Drupal.settings.chartsColorCustom);
+    var disabled = ($("#edit-color-color-palette").children("option:selected").text() == Drupal.settings.chartsColorCustom);
     for (var s = 0, len = series.length; s < len; ++s) {
       if (colors[s]) {
         $("#edit-color-"+ series[s]).val(colors[s]);
@@ -22,6 +22,6 @@ Drupal.behaviors.chartsColor = function (context) {
     }
   };
 
-  $("#edit-color-color-palettes").change(chartsColor);
+  $("#edit-color-color-palette").change(chartsColor);
   chartsColor();
 };
