@@ -50,8 +50,8 @@ function _google_charts_chart(&$chart, &$data) {
 
   // Chart background color. Since the default color
   // is white (#ffffff), only different colors are considered
-  if (!empty($data['#color']) and $data['#color'] != 'ffffff') {
-    $chart[] = 'chf=bg,s,'. $data['#color'];
+  if (!empty($data['#color']) and $data['#color'] != '#ffffff') {
+    $chart[] = 'chf=bg,s,'. substr($data['#color'], 1);
   }
 
   return;
@@ -148,6 +148,14 @@ function _google_charts_series(&$chart, &$data) {
       $chart_data .= _google_charts_data_codingsimple($series_data[$value], $max);
 
       $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
+
+      if ($data['#type'] == 'pie2D') {
+        // Series legends
+        $legends[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
+
+        // Series colors
+        $colors[] = empty($data[$series][$value]['#color']) ? NULL : substr($data[$series][$value]['#color'], 1);
+      }
     }
 
     // Value labels
@@ -155,11 +163,13 @@ function _google_charts_series(&$chart, &$data) {
       $value_labels += $value_labels_temp;
     }
 
+      if ($data['#type'] != 'pie2D') {
     // Series legends
     $legends[] = empty($data[$series]['#legend']) ? NULL : $data[$series]['#legend'];
 
     // Series colors
-    $colors[] = empty($data[$series]['#color']) ? NULL : $data[$series]['#color'];
+    $colors[] = empty($data[$series]['#color']) ? NULL : substr($data[$series]['#color'], 1);
+    }
   }
 
   // Return the series of data
@@ -171,21 +181,18 @@ function _google_charts_series(&$chart, &$data) {
   $chart[] = 'chd=s:'. $chart_data;
 
   // Insert series legend
-  $legends = implode('|', $legends);
-  if (str_replace('|', '', $legends)) {
-    $chart[] = 'chdl='. $legends;
+  if (!empty($legends)) {
+    $chart[] = 'chdl='. implode('|', $legends);
   }
 
   // Insert series legend
-  $colors = implode(',', $colors);
-  if (str_replace(',', '', $value_labels)) {
-    $chart[] = 'chco='. $colors;
+  if (!empty($colors)) {
+    $chart[] = 'chco='. implode(',', $colors);
   }
 
   // Insert values legend
-  $value_labels = implode('|', $value_labels);
-  if (str_replace('|', '', $value_labels)) {
-    $chart[] = 'chl='. $value_labels;
+  if (!empty($value_labels)) {
+    $chart[] = 'chl='. implode('|', $value_labels);
   }
 
   return;
