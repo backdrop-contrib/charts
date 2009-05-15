@@ -21,28 +21,30 @@ function _charts_color_form_complete(&$form, $default) {
     '#title'          => t('Color'),
     '#tree'           => TRUE
   );
-  $form['color']['color_palettes'] = array(
+  $form['color']['color_palette'] = array(
     '#type'           => 'select',
     '#title'          => t('Color palettes'),
     '#options'        => $default['#color_palettes'],
     '#default_value'  => $default['#color_palette'],
   );
   $form['color']['background'] = array(
-    '#type'           => $field_type,
-    '#title'          => t('Background'),
-    '#default_value'  => $default['#color']['background'],
 //     '#colorpicker'    => 'colorpicker',
+    '#default_value'  => $default['#color']['background'],
+    '#title'          => t('Background'),
+    '#type'           => $field_type,
   );
   $form['color']['text'] = array(
-    '#type'           => $field_type,
-    '#title'          => t('Text'),
     '#default_value'  => $default['#color']['text'],
+    '#required'       => TRUE,
+    '#title'          => t('Text'),
+    '#type'           => $field_type,
   );
   for ($series = 0; $series < 8; $series++) {
     $form['color'][$series] = array(
-      '#type'           => $field_type,
-      '#title'          => t('Series %serie', array('%serie' => $series + 1)),
       '#default_value'  => $default['#color'][$series],
+      '#required'       => TRUE,
+      '#title'          => t('Series %serie', array('%serie' => $series + 1)),
+      '#type'           => $field_type,
     );
   }
 
@@ -57,11 +59,12 @@ function _charts_color_form_complete(&$form, $default) {
  */
 function _charts_color_form_simple(&$form, $settings) {
   // Load some color palettes
-  $form['color_palettes'] = array(
-    '#type'           => 'select',
-    '#title'          => t('Color palettes'),
-    '#options'        => $settings['#color_palettes'],
+  $form['color_palette'] = array(
     '#default_value'  => $settings['#color_palette'],
+    '#options'        => $settings['#color_palettes'],
+    '#required'       => TRUE,
+    '#title'          => t('Color palettes'),
+    '#type'           => 'select',
   );
 }
 
@@ -74,25 +77,24 @@ function _charts_color_form_simple(&$form, $settings) {
  *   HTML. The generic Chart example
  */
 function _charts_example() {
-//   if (empty($data)) {
-    // This will hold the example chart
-    // Since the chart is an example, we should provide
-    // and example data.
-    $data[] = array(
-      '#legend'     => 'Profit',
-      array('#value' => 35, '#label' => t('Jan')),
-      array('#value' => 25, '#label' => t('Feb')),
-      array('#value' => 75, '#label' => t('Mar')),
-      array('#value' => 50, '#label' => t('Apr')),
-      array('#value' => 23, '#label' => t('May')),
-      array('#value' => 12, '#label' => t('Jun')),
-    );
-    $data[] = array(
-      '#legend'     => 'Revenue',
-      10, 20, 55, 72, 45, 50
-    );
-    $data['#title'] = 'Testing Chart';
-//   }
+  // This will hold the example chart
+  // Since the chart is an example, we should provide
+  // and example data.
+  $data[] = array(
+    '#legend'     => 'Profit',
+    array('#value' => 35, '#label' => t('Jan')),
+    array('#value' => 25, '#label' => t('Feb')),
+    array('#value' => 75, '#label' => t('Mar')),
+    array('#value' => 50, '#label' => t('Apr')),
+    array('#value' => 23, '#label' => t('May')),
+    array('#value' => 12, '#label' => t('Jun')),
+  );
+  $data[] = array(
+    '#legend'     => 'Revenue',
+    10, 20, 55, 72, 45, 50
+  );
+  $data['#title'] = 'Testing Chart';
+
   return charts_chart($data);
 }
 
@@ -143,6 +145,7 @@ function _charts_settings_form(&$form, $default = array(), $options = array()) {
   $form['plugin'] = array(
     '#default_value'  => $default['#plugin'],
     '#options'        => $default['#plugins'],
+    '#required'       => TRUE,
     '#type'           => 'select',
     '#title'          => t('Chart plugin'),
   );
@@ -151,6 +154,7 @@ function _charts_settings_form(&$form, $default = array(), $options = array()) {
   $form['type'] = array(
     '#default_value'  => $default['#type'],
     '#options'        => $default['#types'],
+    '#required'       => TRUE,
     '#type'           => 'radios',
     '#title'          => t('Chart type'),
   );
@@ -158,6 +162,7 @@ function _charts_settings_form(&$form, $default = array(), $options = array()) {
   $form['width'] = array(
     '#default_value'  => $default['#width'],
     '#description'    => t('The chart width, in pixels'),
+    '#required'       => TRUE,
     '#size'           => 8,
     '#type'           => 'textfield',
     '#title'          => t('Width'),
@@ -165,6 +170,7 @@ function _charts_settings_form(&$form, $default = array(), $options = array()) {
   $form['height'] = array(
     '#default_value'  => $default['#height'],
     '#description'    => t('The chart height, in pixels'),
+    '#required'       => TRUE,
     '#size'           => 8,
     '#type'           => 'textfield',
     '#title'          => t('Height'),
@@ -215,7 +221,7 @@ function _charts_settings_page_submit(&$form, &$form_state) {
   unset($settings['op']);
 
   // Unwanted values
-  unset($settings['color']['color_palettes']);
+  unset($settings['color']['color_palette']);
 
   // Include a # sign in all attributes, because it will make the
   // merge between the chart data and the defaults easier on every

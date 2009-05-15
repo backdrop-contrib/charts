@@ -35,7 +35,8 @@ class charts_plugin_style_chart extends views_plugin_style {
 
     // Add the Chart Settings form
     module_load_include('admin.inc', 'charts');
-    $form['charts']['#tree'] = TRUE;
+
+    // Get chart settings from options form.
     _charts_settings_form($form['charts'], $this->options['charts']);
 
     $form['show_legend'] = array(
@@ -48,7 +49,7 @@ class charts_plugin_style_chart extends views_plugin_style {
     // Views Calc related fields
     $form['aggregation_field'] = array(
       '#type'           => 'select',
-      '#title'          => t('Aggregation field'),
+      '#title'          => t('Legend field'),
       '#options'        => $this->aggregated_field_options(),
       '#default_value'  => $this->options['aggregation_field'],
       '#description'    => t('Select a field to aggreagate the results on.')
@@ -57,25 +58,36 @@ class charts_plugin_style_chart extends views_plugin_style {
     // update Multiple to TRUE if that changes.
     $form['calc_fields'] = array(
       '#type'           => 'select',
-      '#title'          => t('Computation field'),
+      '#title'          => t('Operation field'),
       '#options'        => $this->aggregated_field_options(),
       '#default_value'  => $this->calc_fields(),
       '#multiple'       => FALSE,
       '#description'    => t('Select field to perform computations on.')
-      );
+    );
     $form['calc'] = array(
       '#type'           => 'select',
-      '#title'          => t('Computation to perform'),
+      '#title'          => t('Operation'),
       '#options'        => $this->calc_options(),
       '#default_value'  => $this->options['calc'],
-      );
+    );
     $form['precision'] = array(
       '#type'           => 'select',
       '#title'          => t('Precision'),
       '#options'        => range(0, 4),
       '#default_value'  => $this->options['precision'],
       '#description'    => t('Decimal points to use in computed values.'),
-      );
+    );
+  }
+
+  /**
+   * Generate a form for setting options.
+   */
+  function options_submit(&$form, &$form_state) {
+    $chart = &$form_state['values']['style_options']['charts'];
+    foreach (element_children($chart) as $index) {
+      $chart['#'. $index] = $chart[$index];
+      unset($chart[$index]);
+    }
   }
 
   /**
@@ -122,9 +134,7 @@ class charts_plugin_style_chart extends views_plugin_style {
    */
   function render() {
     // Get chart settings from options form.
-    foreach ($this->options['charts'] as $index => $value) {
-      $chart['#'. $index] = $value;
-    }
+    $chart = $this->options['charts'];
 
     // Get values from rows.
     foreach ($this->calc_fields() as $calc) {
