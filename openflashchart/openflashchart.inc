@@ -18,7 +18,7 @@ function _openflashchart_chart(&$chart, &$data) {
   $chart->set_title($data['#title']);
   $chart->set_width($data['#width']);
   $chart->set_height($data['#height']);
-  $chart->set_bg_colour($data['#color']);
+  $chart->set_bg_colour($data['#color']['#background']);
 }
 
 /**
