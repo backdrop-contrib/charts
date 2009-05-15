@@ -8,21 +8,17 @@ Drupal.behaviors.chartsColor = function (context) {
   var chartsColor = function() {
     var colors = $("#edit-color-color-palettes").val().split(",");
     var series = ["background", "text", 0, 1, 2, 3, 4, 5, 6, 7];
-    var disabled = ($("#edit-color-palettes").children("option:selected").text() == Drupal.settings.chartsColorCustom);
+    var disabled = ($("#edit-color-color-palettes").children("option:selected").text() == Drupal.settings.chartsColorCustom);
     for (var s = 0, len = series.length; s < len; ++s) {
-      $("#edit-color-"+ s).val(colors[s]);
+      if (colors[s]) {
+        $("#edit-color-"+ series[s]).val(colors[s]);
+      }
       if (disabled) {
-        $("#edit-color-"+ s).attr("disabled", "");
+        $("#edit-color-"+ series[s]).removeAttr("readonly");
       }
       else {
-        $("#edit-color-"+ s).attr("disabled", "disabled");
+        $("#edit-color-"+ series[s]).attr("readonly", "readonly");
       }
-    }
-    if (disabled) {
-      $("#edit-colorpicker").attr("disabled", "");
-    }
-    else {
-      $("#edit-colorpicker").attr("disabled", "disabled");
     }
   };
 

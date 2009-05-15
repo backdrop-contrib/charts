@@ -214,10 +214,8 @@ function _charts_settings_page_submit(&$form, &$form_state) {
   unset($settings['form_token']);
   unset($settings['op']);
 
-  // Save the Color palette. Firts, filter the data, cluster the results
-  // into a single string. Finally, unset all field values, since they
-  // are useless
-  $settings['color_palette'] = implode(',', $settings['color']);
+  // Unwanted values
+  unset($settings['color']['color_palettes']);
 
   // Include a # sign in all attributes, because it will make the
   // merge between the chart data and the defaults easier on every

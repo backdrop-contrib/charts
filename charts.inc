@@ -28,7 +28,15 @@ function _charts_chart(&$data) {
   }
 
   // Merge deafult series attributes with data
+  $number = -1;
   foreach (element_children($data) as $series) {
+    ++$number;
+    if (!is_numeric($series)) {
+      $data[$number] = $data[$series];
+      unset($data[$series]);
+      $series = $number;
+    }
+
     foreach (element_children($data[$series]) as $value) {
       if (!is_array($data[$series][$value])) {
         $data[$series][$value] = array(
@@ -105,16 +113,18 @@ function _charts_settings() {
     $default['#height'] = empty($default['#height']) ? 200 : $default['#height'];
 
     // Color Palette
-    $default['#color_palettes'] = _charts_settings_color_palette();
-    if (empty($default['#color_palette'])) {
-      $default['#color_palette'] = current(array_keys($default['#color_palettes']));
-    }
-
-    // Color
-    $default['#color'] = explode( ',', $default['#color_palette']);
-    $default['#color']['background'] = array_shift($default['#color']);
-    $default['#color']['text']       = array_shift($default['#color']);
     $default['#series_attributes'][] = '#color';
+    $default['#color_palettes'] = _charts_settings_color_palette();
+    if (empty($default['#color'])) {
+      $default['#color_palette'] = current(array_keys($default['#color_palettes']));
+      $default['#color'] = explode($default['#color_palette']);
+      $default['#color']['background'] = array_shift($default['#color']);
+      $default['#color']['text'] = array_shift($default['#color']);
+    }
+    else {
+      $color_palette = implode(',', $default['#color']);
+      $default['#color_palette'] = isset($default['#color_palettes'][$color_palette]) ? $color_palette : '';
+    }
   }
 
   return $default;
