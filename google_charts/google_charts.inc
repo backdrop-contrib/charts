@@ -146,10 +146,6 @@ function _google_charts_series(&$chart, &$data) {
       $chart_data .= ',';
     }
 
-    if ($data['#type'] == 'pie2D' and !empty($series)) {
-
-    }
-
     // Get only the numeric values from the series
     $series_data = _charts_series_values($data[$series]);
 
@@ -161,16 +157,25 @@ function _google_charts_series(&$chart, &$data) {
 
     // For each series of data, scan it
     foreach (array_keys($series_data) as $value) {
+      $svalue = &$data[$series][$value];
       $chart_data .= _google_charts_data_codingsimple($series_data[$value], $max);
 
-      $value_labels_temp[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
+      $value_labels_temp[] = empty($svalue['#label']) ? NULL : $svalue['#label'];
 
-      if ($options['value_attributes']) {
+      // Get the highlight points
+      if (!empty($svalue['#highlight'])
+          or ($data['#type'] == 'scatter' and ($series % 2 == 0))) {
+        $highlight[] = 't'. $svalue['#label'] .','.
+          (empty($svalue['#color']) ? substr($data[$series]['#color'], 1) : substr($svalue['#color'], 1)) .','.
+          $series .','.
+          $value .','.
+          (empty($svalue['#size']) ? 10 : $svalue['#size']);
+      }
+
+      if ($options['value_attributes']
+          or ($data['#type'] == 'scatter' and ($series % 2 == 0))) {
         // Series legends
-        $legends[] = empty($data[$series][$value]['#label']) ? NULL : $data[$series][$value]['#label'];
-
-        // Series colors
-        $colors[] = empty($data[$series][$value]['#color']) ? NULL : substr($data[$series][$value]['#color'], 1);
+        $value_labels[] = empty($svalue['#label']) ? NULL : $svalue['#label'];
       }
     }
 
@@ -196,7 +201,7 @@ function _google_charts_series(&$chart, &$data) {
    // Insert data
   $chart[] = 'chd=s:'. $chart_data;
 
-  // Insert series legend
+  // Insert series color
   if (!empty($colors)) {
     $chart[] = 'chco='. implode(',', $colors);
   }
@@ -206,9 +211,15 @@ function _google_charts_series(&$chart, &$data) {
     $chart[] = 'chl='. implode('|', $value_labels);
   }
 
+
   // Insert multiple series tag
   if ($options['legend'] and !empty($legends)) {
     $chart[] = 'chdl='. implode('|', $legends);
+  }
+
+  // Insert values labels
+  if (!empty($highlight)) {
+    $chart[] = 'chm='. implode('|', $highlight);
   }
 
   return;
