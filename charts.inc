@@ -146,7 +146,7 @@ function _charts_settings() {
     $default['#color_palettes'] = _charts_settings_color_palette();
     if (empty($default['#color'])) {
       $default['#color_palette'] = current(array_keys($default['#color_palettes']));
-      $default['#color'] = explode($default['#color_palette']);
+      $default['#color'] = explode(',', $default['#color_palette']);
       $default['#color']['background'] = array_shift($default['#color']);
       $default['#color']['text'] = array_shift($default['#color']);
     }
