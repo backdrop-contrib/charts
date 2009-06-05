@@ -69,8 +69,11 @@ function _fusioncharts_values($type, $data, $options = array()) {
  *   String. The string presentation of series data
  */
 function _fusioncharts_chart(&$chart, &$data) {
-  $chart['attributes']['bgColor'] = $data['#color'];
-  $chart['attributes']['caption'] = $data['#title'];
+  $chart['attributes']['bgColor'] = $data['#color']['background'];
+  if (isset($data['#title'])) {
+    $chart['attributes']['caption'] = $data['#title'];
+  }
+  $chart['attributes']['animation'] = '0';
 }
 
 /**
@@ -86,19 +89,19 @@ function _fusioncharts_charts_render(&$data) {
   // Since its a requirement to build the chart on Google, if the value
   // was not found, return nothing and stop the execution.
   $options = array(
-    'line2D'  => '/swf/MSLine.swf',
-    'hbar2D'  => '/swf/MSBar2D.swf',
-    'hbar3D'  => '/swf/MSBar3D.swf',
-    'vbar2D'  => '/swf/MSColumn2D.swf',
-    'vbar3D'  => '/swf/MSColumn3D.swf',
-    'pie2D'   => '/swf/Pie2D.swf',
-    'pie3D'   => '/swf/Pie3D.swf',
+    'line2D'  => 'MSLine.swf',
+    'hbar2D'  => 'MSBar2D.swf',
+    'hbar3D'  => 'MSBar3D.swf',
+    'vbar2D'  => 'MSColumn2D.swf',
+    'vbar3D'  => 'MSColumn3D.swf',
+    'pie2D'   => 'Pie2D.swf',
+    'pie3D'   => 'Pie3D.swf',
   );
   if (empty($options[$data['#type']])) {
     return t('This type is not possible using %chartplugin',
       array('%chartplugin' => 'FusionCharts'));
   }
-  $file = url(drupal_get_path('module', 'fusioncharts') . $options[$data['#type']]);
+  $file = file_create_url('fusioncharts') .'/'. $options[$data['#type']];
 
   // Convert the chat SIZE into the FusionCharts way.
   // Since its a requirement to build the chart on Google, if the value
@@ -130,11 +133,12 @@ function _fusioncharts_charts_render(&$data) {
 
   // Its the HTML tag to include the chart
   return <<<FUSIONCHARTS
-<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000">
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" width="$width" height="$height">
   <param name="allowScriptAccess" value="always" />
-  <param name="FlashVars" value="$chart" />
+  <param name="movie" value="$file" />
+  <param name="FlashVars" value="&chartWidth=$width&chartHeight=$height$chart" />
   <param name="quality" value="high" />
-  <embed src="$file" flashVars="$chart" width="$width" height="$height" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+  <embed src="$file" flashVars="&chartWidth=$width&chartHeight=$height$chart" width="$width" height="$height" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer" />
 </object>
 FUSIONCHARTS;
 }
@@ -154,21 +158,20 @@ function _fusioncharts_series(&$chart, &$data) {
   // Since its a requirement to build the chart on FusionCharts, if the value
   // was not found, return nothing and stop the execution.
   foreach (element_children($data) as $series) {
+    $series_data = array();
     foreach (element_children($data[$series]) as $values) {
-      if (is_array($data[$series][$values])) {
-        $series_data[] = array(
-          'value' => $data[$series][$values]['#value'],
-          'label' => $data[$series][$values]['#label'],
-        );
+      $serie_data = array(
+        'value' => $data[$series][$values]['#value']
+      );
+      if (isset($data[$series][$values]['#label'])) {
+        $serie_data['label'] = $data[$series][$values]['#label'];
       }
-      else {
-        $series_data[] = array(
-          'value' => $data[$series][$values],
-        );
-      }
+      $series_data[] = $serie_data;
     }
 
-    $options['color'] = trim($data['#color_palette'][$series]);
+    if (isset($data['#color'][$series])) {
+      $options['color'] = substr($data['#color'][$series], 1);
+    }
 
     $chart['value'][] = _fusioncharts_values('set', $series_data, $options);
 
@@ -182,14 +185,16 @@ function _fusioncharts_series(&$chart, &$data) {
     foreach (array_keys($series_data) as $value) {
       if (empty($data[$series][$value]['#label'])) {
         $value_labels[] = '';
+        $toogle = TRUE;
       }
       else {
         $value_labels[] = $data[$series][$value]['#label'];
         $toogle = TRUE;
       }
     }
-    if (!empty($toogle)) {
+    if (!empty($toogle) and empty($chart['categories'])) {
       $chart['value'][] = _fusioncharts_values('category', $value_labels);
+      $chart['categories'] = TRUE;
     }
   }
 }
@@ -221,7 +226,7 @@ function _fusioncharts_series_single(&$chart, &$data) {
         $series_data[] = array(
           'value' => $data[$series][$values]['#value'],
           'label' => $data[$series][$values]['#label'],
-          'color' => trim($data['#color_palette'][$series])
+          'color' => trim($data['#color'][$values])
         );
       }
       else {
