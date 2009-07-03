@@ -73,7 +73,9 @@ function _charts_chart(&$data) {
  */
 function _chart_series_attributes(&$data, &$value, &$settings) {
   foreach ($settings['#series_attributes'] as $attribute) {
-    $data[$attribute] = $settings[$attribute][$value];
+    if (isset($settings[$attribute][$value])) {
+      $data[$attribute] = $settings[$attribute][$value];
+    }
   }
 }
 

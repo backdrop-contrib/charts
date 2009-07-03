@@ -42,7 +42,7 @@ function _google_charts_chart(&$chart, &$data) {
     $chart[] = 'cht=pc';
   }
   else {
-    $chart[] = 'cht='. $options['typecode'];
+    $chart[] = 'cht=' . $options['typecode'];
   }
 
   // Convert the chat SIZE into the Google Chart way.
@@ -51,17 +51,17 @@ function _google_charts_chart(&$chart, &$data) {
   if (empty($data['#width']) or empty($data['#height'])) {
     return t('Height and Width are required');
   }
-  $chart[] = 'chs='. $data['#width'] .'x'. $data['#height'];
+  $chart[] = 'chs=' . $data['#width'] . 'x' . $data['#height'];
 
   // Add Title and Description to the chart
   if (!empty($data['#title'])) {
-    $chart[] = 'chtt='. $data['#title'];
+    $chart[] = 'chtt=' . $data['#title'];
   }
 
   // Chart background color. Since the default color
   // is white (#ffffff), only different colors are considered
   if (!empty($data['#color']['background']) and $data['#color']['background'] != '#ffffff') {
-    $chart[] = 'chf=bg,s,'. substr($data['#color']['background'], 1);
+    $chart[] = 'chf=bg,s,' . substr($data['#color']['background'], 1);
   }
 
   return;
@@ -117,7 +117,7 @@ function _google_charts_render(&$data) {
   }
 
   // If its all ok, build the HTML img tag
-  return '<img src="http://chart.apis.google.com/chart?'. implode('&amp;', $chart) .'" />';
+  return '<img src="http://chart.apis.google.com/chart?' . implode('&amp;', $chart) . '" />';
 }
 
 /**
@@ -165,10 +165,10 @@ function _google_charts_series(&$chart, &$data) {
       // Get the highlight points
       if (!empty($svalue['#highlight'])
           or ($data['#type'] == 'scatter' and ($series % 2 == 0))) {
-        $highlight[] = 't'. $svalue['#label'] .','.
-          (empty($svalue['#color']) ? substr($data[$series]['#color'], 1) : substr($svalue['#color'], 1)) .','.
-          $series .','.
-          $value .','.
+        $highlight[] = 't' . $svalue['#label'] . ',' .
+          (empty($svalue['#color']) ? substr($data[$series]['#color'], 1) : substr($svalue['#color'], 1)) . ',' .
+          $series . ',' .
+          $value . ',' .
           (empty($svalue['#size']) ? 10 : $svalue['#size']);
       }
 
@@ -199,27 +199,27 @@ function _google_charts_series(&$chart, &$data) {
   }
 
    // Insert data
-  $chart[] = 'chd=s:'. $chart_data;
+  $chart[] = 'chd=s:' . $chart_data;
 
   // Insert series color
   if (!empty($colors)) {
-    $chart[] = 'chco='. implode(',', $colors);
+    $chart[] = 'chco=' . implode(',', $colors);
   }
 
   // Insert values labels
   if (!empty($value_labels)) {
-    $chart[] = 'chl='. implode('|', $value_labels);
+    $chart[] = 'chl=' . implode('|', $value_labels);
   }
 
 
   // Insert multiple series tag
   if ($options['legend'] and !empty($legends)) {
-    $chart[] = 'chdl='. implode('|', $legends);
+    $chart[] = 'chdl=' . implode('|', $legends);
   }
 
   // Insert values labels
   if (!empty($highlight)) {
-    $chart[] = 'chm='. implode('|', $highlight);
+    $chart[] = 'chm=' . implode('|', $highlight);
   }
 
   return;

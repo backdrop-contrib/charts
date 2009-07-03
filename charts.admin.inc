@@ -48,7 +48,7 @@ function _charts_color_form_complete(&$form, $default) {
     );
   }
 
-  drupal_add_js(drupal_get_path('module', 'charts') .'/charts_color.js');
+  drupal_add_js(drupal_get_path('module', 'charts') . '/charts_color.js');
   drupal_add_js(array('chartsColorCustom' => t('Custom')), 'setting');
 }
 
@@ -110,7 +110,7 @@ function _charts_module_invoke_all() {
   unset($args[0]);
   $return = array();
   foreach (module_implements($hook) as $module) {
-    $function = $module .'_'. $hook;
+    $function = $module . '_' . $hook;
     $result = call_user_func_array($function, $args);
     if (isset($result) && is_array($result)) {
       $return += $result;
@@ -227,7 +227,7 @@ function _charts_settings_page_submit(&$form, &$form_state) {
   // merge between the chart data and the defaults easier on every
   // chart display.
   foreach ($settings as $index => $value) {
-    $default['#'. $index] = $value;
+    $default['#' . $index] = $value;
   }
 
   // Save the data into database

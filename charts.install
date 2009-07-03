@@ -6,7 +6,7 @@
  * Install and unistall functions for this module
  */
 
-DEFINE(CHARTS_MINIMUM_PHP, '5.2.0');
+DEFINE('CHARTS_MINIMUM_PHP', '5.2.0');
 
 /**
  * Implementation of hook_uninstall().

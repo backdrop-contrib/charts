@@ -81,7 +81,7 @@ function _charts_system_charts($ctype) {
       break;
   }
 
-  return '<div id="charts-system">'. $output .'</div>';
+  return '<div id="charts-system">' . $output . '</div>';
 }
 
 /**
@@ -109,7 +109,7 @@ function _charts_system_generate($title, $sql, $callback = NULL) {
 
     $data[] = array(
       '#value'  => $result['count'],
-      '#label'  => $result['name'] .': '. $result['count']
+      '#label'  => $result['name'] . ': ' . $result['count']
     );
   }
 
@@ -132,7 +132,7 @@ function _charts_system_generate($title, $sql, $callback = NULL) {
  *   String. The HTML chart when all data is fine or a blank string
  */
 function _charts_system_node_activity() {
-  $now   = time();
+  $now   = REQUEST_TIME;
 
   $results = db_query('SELECT type, created
     FROM {node}
@@ -144,11 +144,17 @@ function _charts_system_node_activity() {
   $max    = array();
   $counts = array();
   $types  = array();
+  $type   = 0;
 
-  while ($result = db_fetch_array($results)) {
-    $day = ltrim(date('d', $result['created']), '0');
-    $types[$result['type']] = $type++;
-    $counts[$day][$result['type']]++;
+  foreach ($results as $result) {
+    $day = ltrim(date('d', $result->created), '0');
+    $types[$result->type] = $type++;
+    if (isset($counts[$day][$result->type])) {
+      $counts[$day][$result->type]++;
+    }
+    else {
+      $counts[$day][$result->type] = 1;
+    }
   }
 
   // Generate data and labels

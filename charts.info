@@ -1,5 +1,10 @@
 ; $Id$
-core            = "6.x"
+core            = "7.x"
 description     = "Transform DATA into INFORMATION using beautiful CHARTS."
+files[]         = charts.module
+files[]         = charts.admin.inc
+files[]         = charts.inc
+files[]         = charts.hooks.inc
+files[]         = charts.install
 name            = "Charts"
 package         = "Charts"

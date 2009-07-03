@@ -95,7 +95,7 @@ class charts_plugin_style_chart extends views_plugin_style {
   function options_submit(&$form, &$form_state) {
     $chart = &$form_state['values']['style_options']['charts'];
     foreach (element_children($chart) as $index) {
-      $chart['#'. $index] = $chart[$index];
+      $chart['#' . $index] = $chart[$index];
       unset($chart[$index]);
     }
   }
@@ -158,7 +158,7 @@ class charts_plugin_style_chart extends views_plugin_style {
             }
             $value['#label'] = strip_tags(theme_views_view_field($this->view, $this->view->field[$key], $row));
             if ($this->options['show_sums']) {
-              $value['#label'] .= ' ('. $row->$calc .')';
+              $value['#label'] .= ' (' . $row->$calc . ')';
             }
             $value['#value'] = $row->$calc;
             $chart[$calc][] = $value;
@@ -188,7 +188,7 @@ class charts_plugin_style_chart extends views_plugin_style {
     // another aggregation in for this field.
 
     foreach ($this->view->field as $field) {
-      $query_field = substr($field->field, 0, 3) == 'cid' ? $field->definition['calc'] : $field->table .'.'. $field->field;
+      $query_field = substr($field->field, 0, 3) == 'cid' ? $field->definition['calc'] : $field->table . '.' . $field->field;
       $query_alias = $field->field_alias;
 
       // Add the aggregation.
@@ -204,7 +204,7 @@ class charts_plugin_style_chart extends views_plugin_style {
       }
       // Add computed values.
       if (in_array($field->field, $this->calc_fields())) {
-        $sql = "ROUND(". $this->options['calc'] ."($query_field), ". $this->options['precision'] .")";
+        $sql = "ROUND(" . $this->options['calc'] . "($query_field), " . $this->options['precision'] . ")";
         $this->view->query->add_field(NULL, $sql, $field->field, array('aggregate' => TRUE));
 
         // TODO This part is not relationship-safe, needs additional work

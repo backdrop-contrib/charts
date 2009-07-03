@@ -1,6 +1,9 @@
 ; $Id$
-core            = "6.x"
+core            = "7.x"
 dependencies[]  = charts
 description     = "Use FusionCharts on your site."
+files[]         = fusioncharts.inc
+files[]         = fusioncharts.hooks.inc
+files[]         = fusioncharts.install
 name            = "FusionCharts"
 package         = "Charts"

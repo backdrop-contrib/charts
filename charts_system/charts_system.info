@@ -1,6 +1,8 @@
 ; $Id$
-core            = "6.x"
+core            = "7.x"
 dependencies[]  = charts
 description     = "Use Charts for Drupal administration"
+files[]         = charts_system.inc
+files[]         = charts_system.hooks.inc
 name            = "Charts System"
 package         = "Charts"

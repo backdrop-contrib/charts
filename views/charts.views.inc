@@ -7,10 +7,10 @@
  */
 
 /**
-* Implementation of hook_views_plugins().
-*
-* Define charts style for Views.
-*/
+ * Implementation of hook_views_plugins().
+ *
+ * Define charts style for Views.
+ */
 function charts_views_plugins() {
   // Views support is only possible if Views Calc module is enabled. It
   // is responsible for turn the Views values into a aggregates.
@@ -24,7 +24,7 @@ function charts_views_plugins() {
       'chart' => array(
         'handler'         => 'charts_plugin_style_chart',
         'help'            => t('Displays the content in several Chart styles.'),
-        'path'            => drupal_get_path('module', 'charts') .'/views',
+        'path'            => drupal_get_path('module', 'charts') . '/views',
         'parent'          => 'parent',
         'title'           => t('Chart'),
         'type'            => 'normal',

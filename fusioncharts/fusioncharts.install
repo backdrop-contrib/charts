@@ -10,8 +10,8 @@
  * Implementation of hook_requirements().
  */
 function fusioncharts_requirements($phase) {
-  $path = file_create_path() .'/fusioncharts';
-  if (!file_exists($path .'/MSLine.swf')) {
+  $path = file_create_path() . '/fusioncharts';
+  if (!file_exists($path . '/MSLine.swf')) {
     $requirements['charts']['title']        = t('FusionCharts');
     $requirements['charts']['value']        = t('FusionCharts flash files not installed');
     $requirements['charts']['severity']     = REQUIREMENT_ERROR;

@@ -101,7 +101,7 @@ function _fusioncharts_charts_render(&$data) {
     return t('This type is not possible using %chartplugin',
       array('%chartplugin' => 'FusionCharts'));
   }
-  $file = file_create_url('fusioncharts') .'/'. $options[$data['#type']];
+  $file = file_create_url('fusioncharts') . '/' . $options[$data['#type']];
 
   // Convert the chat SIZE into the FusionCharts way.
   // Since its a requirement to build the chart on Google, if the value
@@ -129,7 +129,7 @@ function _fusioncharts_charts_render(&$data) {
     return $message;
   }
 
-  $chart =  '&dataXML='. str_replace('"', "'", format_xml_elements(array($chart)));
+  $chart =  '&dataXML=' . str_replace('"', "'", format_xml_elements(array($chart)));
 
   // Its the HTML tag to include the chart
   return <<<FUSIONCHARTS
