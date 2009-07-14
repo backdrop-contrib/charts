@@ -8,3 +8,4 @@ files[]         = charts.hooks.inc
 files[]         = charts.install
 name            = "Charts"
 package         = "Charts"
+php             = 5.2
