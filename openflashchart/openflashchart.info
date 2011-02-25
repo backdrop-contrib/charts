@@ -1,4 +1,3 @@
-; $Id$
 core            = "7.x"
 dependencies[]  = charts
 dependencies[]  = open_flash_chart_api

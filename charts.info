@@ -1,4 +1,3 @@
-; $Id$
 core            = "7.x"
 description     = "Transform DATA into INFORMATION using beautiful CHARTS."
 files[]         = charts.module
