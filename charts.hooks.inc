@@ -24,9 +24,10 @@ function charts_chart_types() {
  * Implementation of hook_menu().
  */
 function charts_menu() {
-  $items['admin/settings/charts'] = array(
+  $items['admin/config/content/charts'] = array(
     'access arguments'  => array('set default settings for charts'),
     'description'     => 'Set the default behaviour and look of all your charts',
+    'file'            => 'charts.admin.inc',
     'page callback'   => 'drupal_get_form',
     'page arguments'  => array('_charts_settings_page'),
     'title'           => 'Charts'

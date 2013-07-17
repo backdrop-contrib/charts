@@ -1,7 +1,5 @@
 core            = "7.x"
 dependencies[]  = charts
 description     = "Use Google Charts on your site."
-files[]         = google_charts.inc
-files[]         = google_charts.hooks.inc
 name            = "Google"
 package         = "Charts"
