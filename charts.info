@@ -1,5 +1,7 @@
-core            = "7.x"
-description     = "Transform DATA into INFORMATION using beautiful CHARTS."
-name            = "Charts"
-package         = "Charts"
-php             = 5.2
+name = Charts
+description = A charting API for Drupal that provides chart elements and integration with Views.
+package = Charts
+core = 7.x
+php = 5.2
+
+files[] = views/charts_plugin_style_chart.inc

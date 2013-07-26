@@ -1,6 +1,5 @@
 <?php
 /**
- * @author Bruno Massa http://drupal.org/user/67164
  * @file
  * Views integration with Charts.
  */
@@ -11,26 +10,19 @@
  * Define charts style for Views.
  */
 function charts_views_plugins() {
-  // Views support is only possible if Views Calc module is enabled. It
-  // is responsible for turn the Views values into a aggregates.
-  if (!module_exists('views_calc')) {
-    return;
-  }
+  $plugins = array();
 
-  return array(
-    'module' => 'charts',
-    'style'  => array(     // Declare the charts style plugin
-      'chart' => array(
-        'handler'         => 'charts_plugin_style_chart',
-        'help'            => t('Displays the content in several Chart styles.'),
-        'path'            => drupal_get_path('module', 'charts') . '/views',
-        'parent'          => 'parent',
-        'title'           => t('Chart'),
-        'type'            => 'normal',
-        'uses fields'     => TRUE,
-        'uses options'    => TRUE,
-        'uses row plugin' => FALSE,
-      ),
-    )
+  $plugins['style']['chart'] = array(
+    'title' => t('Chart'),
+    'help' => t('Displays the content in several Chart styles.'),
+    'handler' => 'charts_plugin_style_chart',
+    'uses row plugin' => FALSE,
+    'uses row class' => FALSE,
+    'uses fields' => TRUE,
+    'uses options' => TRUE,
+    'uses grouping' => FALSE,
+    'type' => 'normal',
   );
+
+  return $plugins;
 }
