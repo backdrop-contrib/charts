@@ -6,16 +6,20 @@
 
 Drupal.behaviors.chartsGoogle = {};
 Drupal.behaviors.chartsGoogle.attach = function(context, settings) {
-  google.setOnLoadCallback(renderCharts);
+  // First time loading in Views preview may not work because the Google JS
+  // API may not yet be loaded.
+  if (typeof google !== 'undefined') {
+    google.load('visualization', '1', { callback: renderCharts });
+  }
+
   function renderCharts() {
-    for (var elementId in settings['chartsGoogle']) {
-      if (settings['chartsGoogle'].hasOwnProperty(elementId)) {
-        var config = settings['chartsGoogle'][elementId];
+    $('.charts-google').once('charts-google-processed', function() {
+      if ($(this).attr('data-chart')) {
+        var config = $.parseJSON($(this).attr('data-chart'));
         var wrap = new google.visualization.ChartWrapper();
         wrap.setChartType(config.visualization);
         wrap.setDataTable(config.data);
         wrap.setOptions(config.options);
-        wrap.setContainerId(elementId);
 
         // Apply data formatters. This only affects tooltips. The same format is
         // already applied via the hAxis/vAxis.format option.
@@ -79,9 +83,9 @@ Drupal.behaviors.chartsGoogle.attach = function(context, settings) {
           }
         }
 
-        wrap.draw();
+        wrap.draw(this);
       }
-    }
+    });
   }
 };
 

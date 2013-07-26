@@ -30,9 +30,9 @@ function _charts_google_render($chart) {
   // Trim out empty options.
   charts_trim_array($chart_definition['options']);
 
-  $chart['#theme'] = 'charts_google_chart';
   $chart['#attached']['library'][] = array('charts_google', 'charts_google');
-  $chart['#attached']['js'][] = array('data' => array('chartsGoogle' => array($chart['#id'] => $chart_definition)), 'type' => 'setting');
+  $chart['#attributes']['class'][] = 'charts-google';
+  $chart['#attributes']['data-chart'] = drupal_json_encode($chart_definition);
 
   return $chart;
 }
@@ -105,7 +105,7 @@ function _charts_google_populate_chart_axes($chart, $chart_definition) {
 
       // Populate the chart data.
       $axis = array();
-      $axis['title'] = $chart[$key]['#title'];
+      $axis['title'] = $chart[$key]['#title'] ? $chart[$key]['#title'] : '';
       $axis['titleTextStyle']['color'] = $chart[$key]['#title_color'];
       $axis['titleTextStyle']['bold'] = $chart[$key]['#title_font_weight'] === 'bold' ? TRUE : FALSE;
       $axis['titleTextStyle']['italic'] = $chart[$key]['#title_font_style'] === 'italic' ? TRUE : FALSE;
@@ -126,8 +126,8 @@ function _charts_google_populate_chart_axes($chart, $chart_definition) {
       $axis['baselineColor'] = $chart[$key]['#base_line_color'];
       $axis['minorGridlines']['color'] = $chart[$key]['#minor_grid_line_color'];
       $axis['viewWindowMode'] = isset($chart[$key]['#max']) ? 'explicit' : NULL;
-      $axis['viewWindow']['max'] = isset($chart[$key]['#max']) ? $chart[$key]['#max'] : NULL;
-      $axis['viewWindow']['min'] = isset($chart[$key]['#max']) ? (int) $chart[$key]['#min'] : NULL;
+      $axis['viewWindow']['max'] = strlen($chart[$key]['#max']) ? (int) $chart[$key]['#max'] : NULL;
+      $axis['viewWindow']['min'] = strlen($chart[$key]['#min']) ? (int) $chart[$key]['#min'] : NULL;
 
       // Multi-axis support only applies to the major axis in Google charts.
       $chart_type_info = chart_get_type($chart['#chart_type']);
@@ -291,17 +291,4 @@ function _charts_google_populate_chart_data(&$chart, $chart_definition) {
   $chart_definition['data'] = $data;
 
   return $chart_definition;
-}
-
-/**
- * Output the chart renderable as a string.
- */
-function theme_charts_google_chart($variables) {
-  $element = $variables['element'];
-
-  $attributes = $element['#attributes'];
-  $attributes['id'] = $element['#id'];
-  $attributes['class'][] = 'chart-render';
-
-  return '<div ' . drupal_attributes($attributes) . '></div>';
 }

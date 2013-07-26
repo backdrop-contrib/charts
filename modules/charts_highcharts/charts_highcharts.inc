@@ -38,9 +38,9 @@ function _charts_highcharts_render($chart) {
     $chart['#id'] = drupal_html_id('highchart-render');
   }
 
-  $chart['#theme'] = 'charts_highcharts_chart';
   $chart['#attached']['library'][] = array('charts_highcharts', 'charts_highcharts');
-  $chart['#attached']['js'][] = array('data' => array('chartsHighcharts' => array($chart['#id'] => $chart_definition)), 'type' => 'setting');
+  $chart['#attributes']['class'][] = 'charts-highchart';
+  $chart['#attributes']['data-chart'] = drupal_json_encode($chart_definition);
 
   return $chart;
 }
@@ -66,7 +66,7 @@ function _charts_highcharts_type($renderable_type) {
  */
 function _charts_highcharts_populate_chart_options($chart, $chart_definition) {
   $chart_definition['chart']['type'] = $chart['#chart_type'];
-  $chart_definition['title']['text'] = $chart['#title'];
+  $chart_definition['title']['text'] = $chart['#title'] ? $chart['#title'] : '';
   $chart_definition['title']['style']['color'] = $chart['#title_color'];
   $chart_definition['title']['style']['fontWeight'] = $chart['#title_font_weight'];
   $chart_definition['title']['style']['fontStyle'] = $chart['#title_font_style'];
@@ -294,17 +294,4 @@ function _charts_highcharts_populate_chart_data(&$chart, $chart_definition) {
   }
 
   return $chart_definition;
-}
-
-/**
- * Output the chart renderable as a string.
- */
-function theme_charts_highcharts_chart($variables) {
-  $element = $variables['element'];
-
-  $attributes = $element['#attributes'];
-  $attributes['id'] = $element['#id'];
-  $attributes['class'][] = 'chart-render';
-
-  return '<div ' . drupal_attributes($attributes) . '></div>';
 }

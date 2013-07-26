@@ -58,13 +58,35 @@ class charts_plugin_style_chart extends views_plugin_style {
   }
 
   /**
+   * Make sure the display and all associated handlers are valid.
+   *
+   * @return
+   *   Empty array if the display is valid; an array of error strings if it is not.
+   */
+  function validate() {
+    $errors = array();
+    $field_handlers = $this->display->handler->get_handlers('field');
+
+    if (count($field_handlers)) {
+      $data_field_key = !empty($this->options['data_fields']) ? current($this->options['data_fields']) : NULL;
+      if (empty($data_field_key)) {
+        $errors[] = t('At least one data field must be selected in the chart configuration before this chart may be shown');
+      }
+      else {
+        $data_field = isset($field_handlers[$data_field_key]) ? $field_handlers[$data_field_key] : NULL;
+        if (!isset($data_field)) {
+          $errors[] = t('A field you have specified as a data field in your chart settings no longer exists. Edit the chart settings and select at least one data field.');
+        }
+      }
+    }
+
+    return $errors;
+  }
+
+  /**
    * Define and display a chart from the grouped values.
    */
   function render() {
-    if (!empty($this->view->preview)) {
-      return t('Preview is not supported with the chart display type.');
-    }
-
     // Calculate the labels field alias.
     $field_handlers = $this->display->handler->get_handlers('field');
     $label_field = FALSE;
@@ -90,10 +112,6 @@ class charts_plugin_style_chart extends views_plugin_style {
     if ($chart_type_info['axis'] === CHARTS_SINGLE_AXIS) {
       $data_field_key = current($this->options['data_fields']);
       $data_field = isset($field_handlers[$data_field_key]) ? $field_handlers[$data_field_key] : NULL;
-
-      if (!isset($data_field)) {
-        return t('At least one field must be set as a data source in the chart format configuration.');
-      }
 
       $data = array();
       foreach ($this->view->result as $row) {
