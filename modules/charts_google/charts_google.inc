@@ -32,7 +32,7 @@ function _charts_google_render($chart) {
 
   $chart['#attached']['library'][] = array('charts_google', 'charts_google');
   $chart['#attributes']['class'][] = 'charts-google';
-  $chart['#attributes']['data-chart'] = drupal_json_encode($chart_definition);
+  $chart['#chart_definition'] = $chart_definition;
 
   return $chart;
 }

@@ -94,10 +94,13 @@ class charts_plugin_style_chart extends views_plugin_style {
       $label_field = $field_handlers[$this->options['label_field']];
     }
 
+    $chart_id = $this->view->name . '__' . $this->view->current_display;
     $chart = array(
       '#type' => 'chart',
       '#chart_type' => $this->options['type'],
       '#chart_library' => $this->options['library'],
+      '#chart_id' => $chart_id,
+      '#id' => drupal_clean_css_identifier('chart_' . $chart_id),
       '#title' => $this->options['title_position'] ? $this->options['title'] : FALSE,
       '#title_position' => $this->options['title_position'],
       '#colors' => $this->options['colors'],

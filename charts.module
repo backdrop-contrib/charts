@@ -50,6 +50,7 @@ function charts_element_info() {
   // Create the elements representing charts themselves.
   $info['chart'] = array(
     '#chart_type' => NULL, // Options: pie, bar, column, etc.
+    '#chart_id' => NULL, // Machine name to alter this chart individually.
     '#title' => NULL,
     '#title_color' => '#000',
     '#title_font_weight' => 'normal', // Options: normal, bold
@@ -232,6 +233,13 @@ function charts_pre_render_element($element) {
   // Generic theme function assuming it will be suitable for most chart types.
   $element['#theme'] = 'charts_chart';
 
+  // Allow the chart to be altered.
+  $alter_hooks = array('chart');
+  if ($element['#chart_id']) {
+    $alter_hooks[] = 'chart_' . $element['#chart_id'];
+  }
+  drupal_alter($alter_hooks, $element, $element['#chart_id']);
+
   // Include the library specific file and render via their callback.
   if (isset($chart_library_info['file'])) {
     $module_path = drupal_get_path('module', $chart_library_info['module']);
@@ -239,6 +247,22 @@ function charts_pre_render_element($element) {
   }
   $callback = $chart_library_info['render'];
   $element = $callback($element);
+
+  if (!empty($element['#chart_definition'])) {
+    $chart_definition = $element['#chart_definition'];
+    unset($element['#chart_definition']);
+
+    // Allow the chart definition to be altered.
+    $alter_hooks = array('chart_definition');
+    if ($element['#chart_id']) {
+      $alter_hooks[] = 'chart_definition_' . $element['#chart_id'];
+    }
+    drupal_alter($alter_hooks, $chart_definition, $element, $element['#chart_id']);
+
+    // Set the element #chart_json property as a data-attribute.
+    $element['#attributes']['data-chart'] = drupal_json_encode($chart_definition);
+  }
+
   return $element;
 }
 

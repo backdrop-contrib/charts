@@ -40,7 +40,7 @@ function _charts_highcharts_render($chart) {
 
   $chart['#attached']['library'][] = array('charts_highcharts', 'charts_highcharts');
   $chart['#attributes']['class'][] = 'charts-highchart';
-  $chart['#attributes']['data-chart'] = drupal_json_encode($chart_definition);
+  $chart['#chart_definition'] = $chart_definition;
 
   return $chart;
 }
