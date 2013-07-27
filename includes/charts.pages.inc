@@ -305,7 +305,8 @@ function charts_settings_form($form, $defaults = array(), $field_options = array
  * Menu callback; Configure the site-wide defaults for charts.
  */
 function charts_default_settings_form($form, $form_state) {
-  $defaults = variable_get('charts_default_settings', charts_default_settings());
+  $defaults = variable_get('charts_default_settings', array());
+  $defaults += charts_default_settings();
   $field_options = array();
   $parents = array('charts_default_settings');
 

@@ -18,15 +18,11 @@ class charts_plugin_style_chart extends views_plugin_style {
 
     // Get the default chart values
     module_load_include('inc', 'charts', 'includes/charts.pages');
-    $defaults = variable_get('charts_default_settings', charts_default_settings());
+    $defaults = variable_get('charts_default_settings', array());
+    $defaults += charts_default_settings();
     foreach ($defaults as $default_key => $default_value) {
       $options[$default_key]['default'] = $default_value;
     }
-
-    // Views-specific chart options.
-    $options['label_field'] = array(
-      'default' => NULL,
-    );
 
     return $options;
   }
@@ -66,6 +62,11 @@ class charts_plugin_style_chart extends views_plugin_style {
   function validate() {
     $errors = array();
     $field_handlers = $this->display->handler->get_handlers('field');
+
+    // Don't execute validation on the new view page.
+    if ($_GET['q'] === 'admin/structure/views/add') {
+      return;
+    }
 
     if (count($field_handlers)) {
       $data_field_key = !empty($this->options['data_fields']) ? current($this->options['data_fields']) : NULL;
