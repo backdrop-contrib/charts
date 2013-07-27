@@ -93,6 +93,13 @@ class charts_plugin_style_chart extends views_plugin_style {
     if ($this->options['label_field'] && array_key_exists($this->options['label_field'], $field_handlers)) {
       $label_field = $field_handlers[$this->options['label_field']];
     }
+    $data_field_options = array_filter($this->options['data_fields']);
+    $data_fields = array();
+    foreach ($data_field_options as $field_key) {
+      if (isset($field_handlers[$field_key])) {
+        $data_fields[$field_key] = $field_handlers[$field_key];
+      }
+    }
 
     $chart_id = $this->view->name . '__' . $this->view->current_display;
     $chart = array(
@@ -113,8 +120,7 @@ class charts_plugin_style_chart extends views_plugin_style {
     $chart_type_info = chart_get_type($this->options['type']);
 
     if ($chart_type_info['axis'] === CHARTS_SINGLE_AXIS) {
-      $data_field_key = current($this->options['data_fields']);
-      $data_field = isset($field_handlers[$data_field_key]) ? $field_handlers[$data_field_key] : NULL;
+      $data_field = reset($data_fields);
 
       $data = array();
       foreach ($this->view->result as $row) {
@@ -149,12 +155,6 @@ class charts_plugin_style_chart extends views_plugin_style {
         '#max' => $this->options['yaxis_max'],
         '#min' => $this->options['yaxis_min'],
       );
-      $data_fields = array();
-      foreach ($this->options['data_fields'] as $field_key) {
-        if (isset($field_handlers[$field_key])) {
-          $data_fields[$field_key] = $field_handlers[$field_key];
-        }
-      }
       foreach ($data_fields as $field_key => $field_handler) {
         $chart[$field_handler->field_alias] = array(
           '#type' => 'chart_data',
