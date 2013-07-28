@@ -91,8 +91,10 @@ class charts_plugin_style_chart extends views_plugin_style {
     // Calculate the labels field alias.
     $field_handlers = $this->display->handler->get_handlers('field');
     $label_field = FALSE;
+    $label_field_key = NULL;
     if ($this->options['label_field'] && array_key_exists($this->options['label_field'], $field_handlers)) {
       $label_field = $field_handlers[$this->options['label_field']];
+      $label_field_key = $this->options['label_field'];
     }
     $data_field_options = array_filter($this->options['data_fields']);
     $data_fields = array();
@@ -100,6 +102,10 @@ class charts_plugin_style_chart extends views_plugin_style {
       if (isset($field_handlers[$field_key])) {
         $data_fields[$field_key] = $field_handlers[$field_key];
       }
+    }
+    // Do not allow the label field to be used as a data field.
+    if (isset($data_fields[$label_field_key])) {
+      unset($data_fields[$label_field_key]);
     }
 
     $chart_id = $this->view->name . '__' . $this->view->current_display;
@@ -121,15 +127,17 @@ class charts_plugin_style_chart extends views_plugin_style {
     $chart_type_info = chart_get_type($this->options['type']);
 
     if ($chart_type_info['axis'] === CHARTS_SINGLE_AXIS) {
-      $data_field = reset($data_fields);
+      $data_field_key = key($data_fields);
+      $data_field = $data_fields[$data_field_key];
 
       $data = array();
-      foreach ($this->view->result as $row) {
+      $renders = $this->render_fields($this->view->result);
+      foreach ($renders as $row_number => $row) {
         $data_row = array();
-        if ($label_field) {
-          $data_row[] = $label_field->render($row);
+        if ($label_field_key) {
+          $data_row[] = $renders[$row_number][$label_field_key];
         }
-        $data_row[] = (int) $row->{$data_field->field_alias};
+        $data_row[] = (float) $renders[$row_number][$data_field_key];
         $data[] = $data_row;
       }
 
@@ -157,7 +165,7 @@ class charts_plugin_style_chart extends views_plugin_style {
         '#min' => $this->options['yaxis_min'],
       );
       foreach ($data_fields as $field_key => $field_handler) {
-        $chart[$field_handler->field_alias] = array(
+        $chart[$field_key] = array(
           '#type' => 'chart_data',
           '#data' => array(),
           '#color' => isset($this->options['field_colors'][$field_key]) ? $this->options['field_colors'][$field_key] : NULL,
@@ -168,14 +176,13 @@ class charts_plugin_style_chart extends views_plugin_style {
         );
       }
 
-      foreach ($this->view->result as $row) {
-        if ($label_field) {
-          $chart['xaxis']['#labels'][] = $label_field->render($row);
-          unset($row->{$label_field->field_alias});
+      $renders = $this->render_fields($this->view->result);
+      foreach ($renders as $row_number => $row) {
+        if ($label_field_key) {
+          $chart['xaxis']['#labels'][] = $renders[$row_number][$label_field_key];
         }
-        $row = (array) $row;
-        foreach ($row as $field_alias => $data_item) {
-          $chart[$field_alias]['#data'][] = (int) $data_item;
+        foreach ($data_fields as $field_key => $field_handler) {
+          $chart[$field_key]['#data'][] = (float) $renders[$row_number][$field_key];
         }
       }
     }
