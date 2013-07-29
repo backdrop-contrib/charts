@@ -217,7 +217,9 @@ function _charts_google_populate_chart_data(&$chart, $chart_definition) {
       // These properties are not real Google Charts properties. They are
       // utilized by the formatter in charts_google.js.
       $decimal_count = $chart[$key]['#decimal_count'] ? '.' . str_repeat('0', $chart[$key]['#decimal_count']) : '';
-      $format = $chart[$key]['#prefix'] . '#' . $decimal_count . $chart[$key]['#suffix'];
+      $prefix = _charts_google_escape_icu_characters($chart[$key]['#prefix']);
+      $suffix = _charts_google_escape_icu_characters($chart[$key]['#suffix']);
+      $format = $prefix . '#' . $decimal_count . $suffix;
       $series['_format']['format'] = $format;
 
       // TODO: Convert this from PHP's date format to ICU format.
@@ -291,4 +293,19 @@ function _charts_google_populate_chart_data(&$chart, $chart_definition) {
   $chart_definition['data'] = $data;
 
   return $chart_definition;
+}
+
+/**
+ * Utility to escape special characters in ICU number formats.
+ *
+ * Google will use the ICU format to auto-adjust numbers based on special
+ * characters that are used in the format. This function escapes these special
+ * characters so they just show up as the character specified.
+ *
+ * The format string is a subset of the ICU pattern set. For instance,
+ * {pattern:'#,###%'} will result in output values "1,000%", "750%", and "50%"
+ * for values 10, 7.5, and 0.5.
+ */
+function _charts_google_escape_icu_characters($string) {
+  return preg_replace('/([0-9@#\.\-,E\+;%\'\*])/', "'$1'", $string);
 }
