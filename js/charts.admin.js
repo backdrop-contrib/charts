@@ -10,7 +10,9 @@ Drupal.behaviors.chartsAdmin.attach = function(context, settings) {
   $(context).find('.form-radios.chart-type-radios').once('charts-axis-inverted-processed', function() {
 
     // Manually attach collapsible fieldsets first.
-    Drupal.behaviors.collapse.attach(context, settings);
+    if (Drupal.behaviors.collapse) {
+      Drupal.behaviors.collapse.attach(context, settings);
+    }
 
     var xAxisLabel = $('fieldset.chart-xaxis .fieldset-title').html();
     var yAxisLabel = $('fieldset.chart-yaxis .fieldset-title').html();

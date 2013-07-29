@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains the chart style plugin.
+ * Contains the Chart style (format) plugin (similar to Table, HTML List, etc.)
  */
 
 /**
@@ -24,6 +24,12 @@ class charts_plugin_style_chart extends views_plugin_style {
       $options[$default_key]['default'] = $default_value;
     }
 
+    // Remove the default setting for chart type so it can be inherited if this
+    // is a chart extension type.
+    if ($this->plugin_name === 'chart_extension') {
+      $options['type']['default'] = NULL;
+    }
+
     return $options;
   }
 
@@ -44,6 +50,27 @@ class charts_plugin_style_chart extends views_plugin_style {
     module_load_include('inc', 'charts', 'includes/charts.pages');
     $field_options = $this->display->handler->get_field_labels();
     $form = charts_settings_form($form, $this->options, $field_options, array('style_options'));
+
+    // Reduce the options if this is a chart extension.
+    if ($parent_display = $this->get_parent_chart_display()) {
+      $parent_chart_type = chart_get_type($parent_display->display_options['style_options']['type']);
+      if (empty($form['type']['#default_value'])) {
+        $form['type']['#default_value'] = $parent_display->display_options['style_options']['type'];
+      }
+
+      $form['type']['#description'] = empty($form['type']['#description']) ? '' : $form['type']['#description'] . ' ';
+      $form['type']['#description'] .= t('This chart will be combined with the parent display "@display_title", which is a "@type" chart. Not all chart types may be combined. Selecting a different chart type than the parent may cause errors.', array('@display_title' => $parent_display->display_title, '@type' => $parent_chart_type['label']));
+      $form['fields']['label_field']['#disabled'] = TRUE;
+      $form['display']['#access'] = FALSE;
+      $form['xaxis']['#access'] = FALSE;
+      if ($this->display->handler->options['inherit_yaxis']) {
+        $form['yaxis']['#access'] = FALSE;
+      }
+      else {
+        $form['yaxis']['#title'] = t('Secondary axis');
+        $form['yaxis']['#attributes']['class'] = array();
+      }
+    }
   }
 
   /**
@@ -68,7 +95,12 @@ class charts_plugin_style_chart extends views_plugin_style {
       return;
     }
 
-    if (count($field_handlers)) {
+    // Make sure that all chart extensions first have a parent chart selected.
+    if ($this->plugin_name === 'chart_extension' && $this->get_parent_chart_display() === FALSE) {
+      $errors[] = t('This chart add-on must have a parent chart selected under the chart settings.');
+    }
+    // Make sure that at least one data column has been selected.
+    elseif (count($field_handlers)) {
       $data_field_key = !empty($this->options['data_fields']) ? current($this->options['data_fields']) : NULL;
       if (empty($data_field_key)) {
         $errors[] = t('At least one data field must be selected in the chart configuration before this chart may be shown');
@@ -88,14 +120,17 @@ class charts_plugin_style_chart extends views_plugin_style {
    * Define and display a chart from the grouped values.
    */
   function render() {
-    // Calculate the labels field alias.
     $field_handlers = $this->display->handler->get_handlers('field');
+
+    // Calculate the labels field alias.
     $label_field = FALSE;
     $label_field_key = NULL;
     if ($this->options['label_field'] && array_key_exists($this->options['label_field'], $field_handlers)) {
       $label_field = $field_handlers[$this->options['label_field']];
       $label_field_key = $this->options['label_field'];
     }
+
+    // Assemble the fields to be used to provide data access.
     $data_field_options = array_filter($this->options['data_fields']);
     $data_fields = array();
     foreach ($data_field_options as $field_key) {
@@ -145,7 +180,7 @@ class charts_plugin_style_chart extends views_plugin_style {
         $chart['#legend_title'] = $label_field->options['label'];
       }
 
-      $chart['series'] = array(
+      $chart[$this->view->current_display . '_series'] = array(
         '#type' => 'chart_data',
         '#data' => $data,
         '#title' => $data_field->options['label'],
@@ -165,7 +200,7 @@ class charts_plugin_style_chart extends views_plugin_style {
         '#min' => $this->options['yaxis_min'],
       );
       foreach ($data_fields as $field_key => $field_handler) {
-        $chart[$field_key] = array(
+        $chart[$this->view->current_display . '__' . $field_key] = array(
           '#type' => 'chart_data',
           '#data' => array(),
           '#color' => isset($this->options['field_colors'][$field_key]) ? $this->options['field_colors'][$field_key] : NULL,
@@ -182,13 +217,101 @@ class charts_plugin_style_chart extends views_plugin_style {
           $chart['xaxis']['#labels'][] = $renders[$row_number][$label_field_key];
         }
         foreach ($data_fields as $field_key => $field_handler) {
-          $chart[$field_key]['#data'][] = (float) $renders[$row_number][$field_key];
+          $chart[$this->view->current_display . '__' . $field_key]['#data'][] = (float) $renders[$row_number][$field_key];
+        }
+      }
+    }
+
+    // Check if this display has any children charts that should be applied
+    // on top of it.
+    $parent_display_id = $this->view->current_display;
+    $children_displays = $this->get_children_chart_displays();
+    foreach ($children_displays as $child_display_id => $child_display) {
+      // If the user doesn't have access to the child display, skip.
+      if (!$this->view->access($child_display_id)) {
+        continue;
+      }
+
+      // Generate the subchart by executing the child display. We load a fresh
+      // view here to avoid collisions in shifting the current display while in
+      // a display.
+      $subview = $this->view->clone_view();
+      $subview->set_display($child_display_id);
+
+      // Copy the settings for our axes over to the child view.
+      foreach ($this->options as $option_name => $option_value) {
+        if (strpos($option_name, 'yaxis') === 0 && $child_display->display_options['inherit_yaxis']) {
+          $subview->display_handler->options['style_options'][$option_name] = $option_value;
+        }
+        elseif (strpos($option_name, 'xaxis') === 0) {
+          $subview->display_handler->options['style_options'][$option_name] = $option_value;
+        }
+      }
+
+      // Execute the subview and get the result.
+      $subview->pre_execute();
+      $subview->execute();
+      $subchart = $subview->style_plugin->render($subview->result);
+      $subview->post_execute();
+      unset($subview);
+
+      // Create a secondary axis if needed.
+      if (!$child_display->display_options['inherit_yaxis'] && isset($subchart['yaxis'])) {
+        $chart['secondary_yaxis'] = $subchart['yaxis'];
+        $chart['secondary_yaxis']['#opposite'] = TRUE;
+      }
+
+      // Merge in the child chart data.
+      foreach (element_children($subchart) as $key) {
+        if ($subchart[$key]['#type'] === 'chart_data') {
+          $chart[$key] = $subchart[$key];
+          // If the subchart is a different type than the parent chart, set
+          // the #chart_type property on the individual chart data elements.
+          if ($chart[$key]['#chart_type'] !== $chart['#chart_type']) {
+            $chart[$key]['#chart_type'] = $subchart['#chart_type'];
+          }
+          if (!$child_display->display_options['inherit_yaxis']) {
+            $chart[$key]['#target_axis'] = 'secondary_yaxis';
+          }
         }
       }
     }
 
     // Print the chart.
-    return drupal_render($chart);
+    return $chart;
   }
 
+  /**
+   * Utility function to check if this chart has a parent display.
+   */
+  function get_parent_chart_display() {
+    $parent_display = FALSE;
+    if ($this->plugin_name === 'chart_extension' && $this->display && $this->display->handler->options['parent_display']) {
+      $parent_display_name = $this->display->handler->options['parent_display'];
+      if (isset($this->view->display[$parent_display_name])) {
+        $parent_display = $this->view->display[$parent_display_name];
+      }
+    }
+    // Ensure the parent is a chart.
+    if ($parent_display && $parent_display->display_options['style_plugin'] !== 'chart') {
+      $parent_display = FALSE;
+    }
+    return $parent_display;
+  }
+
+  /**
+   * Utility function to check if this chart has children displays.
+   */
+  function get_children_chart_displays() {
+    $children_displays = array();
+    foreach ($this->view->display as $display_name => $display) {
+      if ($display->display_plugin === 'chart' && $display->display_options['parent_display']) {
+        $parent_display_name = $display->display_options['parent_display'];
+        if ($parent_display_name === $this->view->current_display) {
+          $children_displays[$display_name] = $this->view->display[$display_name];
+        }
+      }
+    }
+    return $children_displays;
+  }
 }
