@@ -63,7 +63,7 @@ class charts_plugin_style_chart extends views_plugin_style {
       $form['fields']['label_field']['#disabled'] = TRUE;
       $form['display']['#access'] = FALSE;
       $form['xaxis']['#access'] = FALSE;
-      if ($this->display->handler->options['inherit_yaxis']) {
+      if ($this->display->handler->get_option('inherit_yaxis')) {
         $form['yaxis']['#access'] = FALSE;
       }
       else {
@@ -240,7 +240,7 @@ class charts_plugin_style_chart extends views_plugin_style {
 
       // Copy the settings for our axes over to the child view.
       foreach ($this->options as $option_name => $option_value) {
-        if (strpos($option_name, 'yaxis') === 0 && $child_display->display_options['inherit_yaxis']) {
+        if (strpos($option_name, 'yaxis') === 0 && $child_display->handler->get_option('inherit_yaxis')) {
           $subview->display_handler->options['style_options'][$option_name] = $option_value;
         }
         elseif (strpos($option_name, 'xaxis') === 0) {
@@ -256,7 +256,7 @@ class charts_plugin_style_chart extends views_plugin_style {
       unset($subview);
 
       // Create a secondary axis if needed.
-      if (!$child_display->display_options['inherit_yaxis'] && isset($subchart['yaxis'])) {
+      if (!$child_display->handler->get_option('inherit_yaxis') && isset($subchart['yaxis'])) {
         $chart['secondary_yaxis'] = $subchart['yaxis'];
         $chart['secondary_yaxis']['#opposite'] = TRUE;
       }
@@ -267,10 +267,10 @@ class charts_plugin_style_chart extends views_plugin_style {
           $chart[$key] = $subchart[$key];
           // If the subchart is a different type than the parent chart, set
           // the #chart_type property on the individual chart data elements.
-          if ($chart[$key]['#chart_type'] !== $chart['#chart_type']) {
+          if ($subchart['#chart_type'] !== $chart['#chart_type']) {
             $chart[$key]['#chart_type'] = $subchart['#chart_type'];
           }
-          if (!$child_display->display_options['inherit_yaxis']) {
+          if (!$child_display->handler->get_option('inherit_yaxis')) {
             $chart[$key]['#target_axis'] = 'secondary_yaxis';
           }
         }
