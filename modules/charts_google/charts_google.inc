@@ -203,7 +203,7 @@ function _charts_google_populate_chart_data(&$chart, $chart_definition) {
         }
         // Most charts provide a single-dimension array of values.
         else {
-          $chart_definition['data'][$index + 1][$series_number + 1] = (int) $data_value;
+          $chart_definition['data'][$index + 1][$series_number + 1] = $data_value;
         }
       }
 
