@@ -117,7 +117,7 @@ class charts_plugin_style_chart extends views_plugin_style {
   }
 
   /**
-   * Define and display a chart from the grouped values.
+   * Render the entire view from the view result.
    */
   function render() {
     $field_handlers = $this->display->handler->get_handlers('field');
