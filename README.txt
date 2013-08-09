@@ -37,7 +37,7 @@ Libraries module for Drupal: https://drupal.org/project/libraries
 
 Then you'll need to download Highcharts and place it in sites/all/libraries
 directory. The highcharts.js file should be located at:
-sites/all/libraries/highcharts/highcharts.js. You will also need to remove a
+sites/all/libraries/highcharts/js/highcharts.js. You will also need to remove a
 directory called "exporting-server" within the Highcharts download. This
 directory contains sample code for exporting charts that may compromise the
 security of your site. The module will throw an error if this directory is left
