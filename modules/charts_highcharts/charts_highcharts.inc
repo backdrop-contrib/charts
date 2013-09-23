@@ -100,6 +100,7 @@ function _charts_highcharts_populate_chart_options($chart, $chart_definition) {
     $chart_definition['legend']['layout'] = 'horizontal';
   }
   elseif ($chart['#legend_position'] === 'top') {
+    $chart_definition['legend']['verticalAlign'] = 'top';
     $chart_definition['legend']['layout'] = 'horizontal';
   }
   else {
