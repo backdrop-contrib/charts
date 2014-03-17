@@ -162,7 +162,7 @@ function charts_permission() {
     ),
     'access example charts' => array(
       'title' => t('Access example charts'),
-      'description' => t('Grants access to the <a href="!url">charts examples</a> page. Use this page for testing chart functionality.'),
+      'description' => t('Grants access to the <a href="!url">charts examples</a> page. Use this page for testing chart functionality.', array('!url' => url('charts/examples'))),
     ),
   );
 }
