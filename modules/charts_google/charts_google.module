@@ -22,7 +22,7 @@ function charts_google_library() {
     'website' => 'https://google-developers.appspot.com/chart/',
     'version' => '1.0',
     'js' => array(
-      array('data' => 'https://www.google.com/jsapi', 'type' => 'external'),
+      array('data' => '//www.google.com/jsapi', 'type' => 'external'),
     ),
   );
   $library['charts_google'] = array(
