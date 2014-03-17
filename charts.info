@@ -3,6 +3,7 @@ description = A charting API for Drupal that provides chart elements and integra
 package = Charts
 core = 7.x
 php = 5.2
+configure = admin/config/content/charts
 
 files[] = views/charts_plugin_style_chart.inc
 files[] = views/charts_plugin_display_chart.inc
