@@ -146,6 +146,14 @@ function _charts_examples_column_simple() {
   return $example;
 }
 
+function _charts_examples_column_stacking() {
+  $example = _charts_examples_column_simple();
+  $example['chart']['#title'] = t('Column stacked');
+  $example['chart']['#stacking'] = TRUE;
+
+  return $example;
+}
+
 function _charts_examples_bar_simple() {
   $example = _charts_examples_column_simple();
   $example['chart']['#title'] = t('Bar simple');
