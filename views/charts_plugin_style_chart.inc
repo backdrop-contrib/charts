@@ -265,6 +265,12 @@ class charts_plugin_style_chart extends views_plugin_style {
       // Execute the subview and get the result.
       $subview->pre_execute();
       $subview->execute();
+
+      // If there's no results, don't attach the subview.
+      if (empty($subview->result)) {
+        continue;
+      }
+
       $subchart = $subview->style_plugin->render($subview->result);
       $subview->post_execute();
       unset($subview);
