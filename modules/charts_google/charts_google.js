@@ -12,6 +12,20 @@ Drupal.behaviors.chartsGoogle.attach = function(context, settings) {
     google.load('visualization', '1', { callback: renderCharts });
   }
 
+  // Redraw charts on window resize.
+  var debounce;
+  $(window).resize(function() {
+    clearTimeout(debounce);
+    debounce = setTimeout(function() {
+      $('.charts-google').each(function() {
+        var wrap = $(this).data('chartsGoogleWrapper');
+        if (wrap) {
+          wrap.draw(this);
+        }
+      });
+    }, 75);
+  });
+
   function renderCharts() {
     $('.charts-google').once('charts-google', function() {
       if ($(this).attr('data-chart')) {
@@ -84,6 +98,7 @@ Drupal.behaviors.chartsGoogle.attach = function(context, settings) {
         }
 
         wrap.draw(this);
+        $(this).data('chartsGoogleWrapper', wrap);
       }
     });
   }
