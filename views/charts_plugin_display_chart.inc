@@ -81,8 +81,8 @@ class charts_plugin_display_chart extends views_plugin_display {
         // the chart display style.
         $display_options = array();
         foreach ($this->view->display as $display_name => $display) {
-          if ($this->view->display[$display_name]->display_options['style_plugin'] === 'chart' && $display_name !== $this->view->current_display) {
-            $display_options[$display_name] = $this->view->display[$display_name]->display_title;
+          if ($display->handler->get_option('style_plugin') === 'chart' && $display_name !== $this->view->current_display) {
+            $display_options[$display_name] = $display->display_title;
           }
         }
         $form['parent_display'] = array(
