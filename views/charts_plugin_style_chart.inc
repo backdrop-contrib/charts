@@ -228,8 +228,9 @@ class charts_plugin_style_chart extends views_plugin_style {
           if ($renders[$row_number][$field_key] === '') {
             $value = NULL;
           }
+          // Strip thousands placeholders if present, then cast to float.
           else {
-            $value = (float) $renders[$row_number][$field_key];
+            $value = (float) str_replace(array(',', ' '), '', $renders[$row_number][$field_key]);
           }
           $chart[$this->view->current_display . '__' . $field_key]['#data'][] = $value;
         }
