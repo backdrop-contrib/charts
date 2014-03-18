@@ -308,7 +308,7 @@ function charts_type_info() {
       'stacking' => FALSE,
     );
   }
-  drupal_alter('charts_type_info', $charts_info);
+  drupal_alter('charts_type_info', $charts_type_info);
   return $charts_type_info;
 }
 
