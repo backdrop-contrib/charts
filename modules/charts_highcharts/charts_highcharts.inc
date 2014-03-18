@@ -184,6 +184,7 @@ function _charts_highcharts_populate_chart_data(&$chart, $chart_definition) {
   foreach (element_children($chart) as $key) {
     if ($chart[$key]['#type'] === 'chart_data') {
       $series = array();
+      $series_data = array();
 
       // Make sure defaults are loaded.
       if (empty($chart[$key]['#defaults_loaded'])) {
@@ -208,17 +209,17 @@ function _charts_highcharts_populate_chart_data(&$chart, $chart_definition) {
       // Allow data to provide the labels. This will override the axis settings.
       if ($chart[$key]['#labels']) {
         foreach ($chart[$key]['#labels'] as $label_index => $label) {
-          $series['data'][$label_index][0] = $label;
+          $series_data[$label_index][0] = $label;
         }
       }
 
       // Populate the data.
       foreach ($chart[$key]['#data'] as $data_index => $data) {
-        if (isset($series['data'][$data_index])) {
-          $series['data'][$data_index][] = $data;
+        if (isset($series_data[$data_index])) {
+          $series_data[$data_index][] = $data;
         }
         else {
-          $series['data'][$data_index] = $data;
+          $series_data[$data_index] = $data;
         }
       }
 
@@ -227,6 +228,7 @@ function _charts_highcharts_populate_chart_data(&$chart, $chart_definition) {
       $series['color'] = $chart[$key]['#color'];
       $series['marker']['radius'] = $chart[$key]['#marker_radius'];
       $series['showInLegend'] = $chart[$key]['#show_in_legend'];
+      $series['connectNulls'] = TRUE;
 
       $series['tooltip']['valueDecimals'] = $chart[$key]['#decimal_count'];
       $series['tooltip']['xDateFormat'] = $chart[$key]['#date_format'];
@@ -241,8 +243,11 @@ function _charts_highcharts_populate_chart_data(&$chart, $chart_definition) {
         $chart_definition['yAxis'][$yaxis_index]['labels']['format'] = $chart[$key]['#prefix'] . "{value$decimal_formatting}" . $chart[$key]['#suffix'];
       }
 
-      // Add the series to the main chart definition.
+      // Remove unnecessary keys to trim down the resulting JS settings.
       charts_trim_array($series);
+      $series['data'] = $series_data;
+
+      // Add the series to the main chart definition.
       $chart_definition['series'][$key] = $series;
 
       // Merge in any point-specific data points.

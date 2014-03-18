@@ -73,6 +73,7 @@ function _charts_google_populate_chart_options($chart, $chart_definition) {
   $chart_definition['options']['pieSliceText'] = $chart['#data_labels'] ? NULL : 'none';
   $chart_definition['options']['legend']['position'] = $chart['#legend_position'] ? $chart['#legend_position'] : 'none';
   $chart_definition['options']['legend']['alignment'] = 'center';
+  $chart_definition['options']['interpolateNulls'] = TRUE;
 
   // TODO: Legend title (and thus these properties) not supported by Google.
   $chart_definition['options']['legend']['title'] = $chart['#legend_title'];

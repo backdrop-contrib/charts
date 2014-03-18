@@ -172,7 +172,14 @@ class charts_plugin_style_chart extends views_plugin_style {
         if ($label_field_key) {
           $data_row[] = $renders[$row_number][$label_field_key];
         }
-        $data_row[] = (float) $renders[$row_number][$data_field_key];
+        // Convert empty strings to NULL.
+        if ($renders[$row_number][$data_field_key] === '') {
+          $value = NULL;
+        }
+        else {
+          $value = (float) $renders[$row_number][$data_field_key];
+        }
+        $data_row[] = $value;
         $data[] = $data_row;
       }
 
@@ -217,7 +224,14 @@ class charts_plugin_style_chart extends views_plugin_style {
           $chart['xaxis']['#labels'][] = $renders[$row_number][$label_field_key];
         }
         foreach ($data_fields as $field_key => $field_handler) {
-          $chart[$this->view->current_display . '__' . $field_key]['#data'][] = (float) $renders[$row_number][$field_key];
+          // Convert empty strings to NULL.
+          if ($renders[$row_number][$field_key] === '') {
+            $value = NULL;
+          }
+          else {
+            $value = (float) $renders[$row_number][$field_key];
+          }
+          $chart[$this->view->current_display . '__' . $field_key]['#data'][] = $value;
         }
       }
     }
