@@ -170,7 +170,8 @@ class charts_plugin_style_chart extends views_plugin_style {
       foreach ($renders as $row_number => $row) {
         $data_row = array();
         if ($label_field_key) {
-          $data_row[] = $renders[$row_number][$label_field_key];
+          // Labels need to be decoded, as the charting library will re-encode.
+          $data_row[] = htmlspecialchars_decode($renders[$row_number][$label_field_key], ENT_QUOTES);
         }
         // Convert empty strings to NULL.
         if ($renders[$row_number][$data_field_key] === '') {
