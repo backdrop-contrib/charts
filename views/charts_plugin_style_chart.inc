@@ -326,7 +326,8 @@ class charts_plugin_style_chart extends views_plugin_style {
   function get_children_chart_displays() {
     $children_displays = array();
     foreach ($this->view->display as $display_name => $display) {
-      if ($display->display_plugin === 'chart' && $display->display_options['parent_display'] && empty($display->deleted)) {
+      $display_enabled = $this->view->display[$display_name]->handler->get_option('enabled');
+      if ($display->display_plugin === 'chart' && $display->display_options['parent_display'] && empty($display->deleted) && $display_enabled) {
         $parent_display_name = $display->display_options['parent_display'];
         if ($parent_display_name === $this->view->current_display) {
           $children_displays[$display_name] = $this->view->display[$display_name];
