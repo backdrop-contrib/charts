@@ -161,39 +161,6 @@ function _charts_examples_bar_simple() {
   return $example;
 }
 
-function _charts_examples_line() {
-  $chart = array(
-    '#type' => 'chart',
-    '#chart_type' => 'line',
-    '#title' => t('Line with discrete axis'),
-  );
-  // Test with a gap in the data.
-  $chart['male'] = array(
-    '#type' => 'chart_data',
-    '#title' => t('Male'),
-    '#data' => array(array(0, 0), array(20, 40), array(22, 30), array(36, 30), array(40, 40)),
-  );
-  $chart['female'] = array(
-    '#type' => 'chart_data',
-    '#title' => t('Female'),
-    '#data' => array(array(0, 5), array(20, 14), array(22, 16), array(36, 36), array(40, 48)),
-  );
-
-  $example['chart'] = $chart;
-
-  return $example;
-}
-
-function _charts_examples_line_continuous() {
-  $example = _charts_examples_line();
-  $example['chart']['#title'] = t('Line with continuous axis');
-  $example['chart']['xaxis'] = array(
-    '#type' => 'chart_xaxis',
-    '#continuous' => TRUE,
-  );
-  return $example;
-}
-
 function _charts_examples_line_gap() {
   $chart = array(
     '#type' => 'chart',

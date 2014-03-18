@@ -197,7 +197,6 @@ class charts_plugin_style_chart extends views_plugin_style {
       $chart['xaxis'] = array(
         '#type' => 'chart_xaxis',
         '#title' => $this->options['xaxis_title'] ? $this->options['xaxis_title'] : FALSE,
-        '#continuous' => $this->options['xaxis_continuous'],
         '#labels_rotation' => $this->options['xaxis_labels_rotation'],
       );
       $chart['yaxis'] = array(
@@ -266,12 +265,6 @@ class charts_plugin_style_chart extends views_plugin_style {
       // Execute the subview and get the result.
       $subview->pre_execute();
       $subview->execute();
-
-      // If there's no results, don't attach the subview.
-      if (empty($subview->result)) {
-        continue;
-      }
-
       $subchart = $subview->style_plugin->render($subview->result);
       $subview->post_execute();
       unset($subview);

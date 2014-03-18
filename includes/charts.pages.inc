@@ -209,18 +209,6 @@ function charts_settings_form($form, $defaults = array(), $field_options = array
     '#default_value' => $options['xaxis_title'],
     '#parents' => array_merge($parents, array('xaxis_title')),
   );
-  $form['xaxis']['continuous'] = array(
-    '#title' => t('Axis data type'),
-    '#type' => 'radios',
-    '#options' => array(
-      0 => t('Discrete'),
-      1 => t('Continuous'),
-      2 => t('Continuous date')
-    ),
-    '#default_value' => $options['xaxis_continuous'],
-    '#description' => t('A continuous axis will space points based on their values. See <a href="https://developers.google.com/chart/interactive/docs/customizing_axes#Discrete_vs_Continuous">these examples</a> that elaborate on the different axis types.'),
-    '#parents' => array_merge($parents, array('xaxis_continuous')),
-  );
   $form['xaxis']['labels_rotation'] = array(
     '#title' => t('Labels rotation'),
     '#type' => 'select',
@@ -383,7 +371,6 @@ function charts_default_settings() {
   $defaults['height'] = NULL;
 
   $defaults['xaxis_title'] = '';
-  $defaults['xaxis_continuous'] = 0; 
   $defaults['xaxis_labels_rotation'] = 0;
 
   $defaults['yaxis_title'] = '';
