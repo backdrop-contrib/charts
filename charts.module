@@ -103,6 +103,7 @@ function charts_element_info() {
     '#max' => NULL, // Integer max value on this axis.
     '#min' => NULL, // Integer minimum value on this axis.
     '#opposite' => FALSE, // Display axis on opposite normal side.
+    '#continuous' => FALSE, // Options: FALSE, TRUE, or 'date'.
   );
   $info['chart_xaxis'] = array(
   ) + $axis_properties;
@@ -413,6 +414,14 @@ function charts_cast_element_integer_values(&$element) {
   }
 }
 
+/**
+ * Given a date value, attempt to standardize the input.
+ */
+function charts_convert_date_value($date_string) {
+  $timezone = new DateTimeZone('UTC');
+  $date = new DateTime($date_string, $timezone);
+  return $date->format('U');
+}
 
 /**
  * Output the chart renderable as a string.

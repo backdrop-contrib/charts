@@ -152,6 +152,14 @@ function _charts_highcharts_populate_chart_axes($chart, $chart_definition) {
       $axis['min'] = $chart[$key]['#min'];
       $axis['opposite'] = $chart[$key]['#opposite'];
 
+      // Change axis_type to datetime and delete categories when needed.
+      if ($chart[$key]['#continuous']) {
+        $axis['categories'] = '';
+        if ($chart[$key]['#continuous'] === 'date') {
+          $axis['type'] = 'datetime';
+        }
+      }
+
       // Dealing with axis rotation in a reasonable manner is complicated in
       // Highcharts. We want the label to be reasonably positioned on the
       // outside of the chart when labels are rotated.
@@ -204,6 +212,22 @@ function _charts_highcharts_populate_chart_data(&$chart, $chart_definition) {
           }
         }
         $series['yAxis'] = $axis_index;
+      }
+
+      // Change data string to number when continuous axis is needed.
+      foreach (element_children($chart) as $axis_key) {
+        if ($chart[$axis_key]['#type'] === 'chart_xaxis') {
+          if (!empty($chart[$axis_key]['#continuous'])) {
+            foreach ($chart[$axis_key]['#labels'] as $label_index => $label) {
+              if ($chart[$axis_key]['#continuous'] === 'date') {
+                $series['data'][$label_index][0] = 'U' . charts_convert_date_value($label);
+              }
+              else {
+                $series['data'][$label_index][0] = $label + 0;
+              }
+            }
+          }
+        }
       }
 
       // Allow data to provide the labels. This will override the axis settings.

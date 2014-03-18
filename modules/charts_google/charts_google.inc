@@ -114,7 +114,17 @@ function _charts_google_populate_chart_axes($chart, $chart_definition) {
       // In Google, the row column of data is used as labels.
       if ($chart[$key]['#labels'] && $chart[$key]['#type'] === 'chart_xaxis') {
         foreach ($chart[$key]['#labels'] as $label_key => $label) {
-          $chart_definition['data'][$label_key + 1][0] = $label;
+          if ($chart[$key]['#continuous']) {
+            if ($chart[$key]['#continuous'] === 'date') {
+              $chart_definition['data'][$label_key + 1][0] = charts_convert_date_value($label);
+            }
+            else {
+              $chart_definition['data'][$label_key + 1][0] = $label + 0;
+            }
+          }
+          else {
+            $chart_definition['data'][$label_key + 1][0] = $label;
+          }
         }
       }
       $axis['textStyle']['color'] = $chart[$key]['#labels_color'];
