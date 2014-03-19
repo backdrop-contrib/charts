@@ -121,7 +121,7 @@ function _charts_google_populate_chart_axes($chart, $chart_definition) {
       $axis['textStyle']['bold'] = $chart[$key]['#labels_font_weight'] === 'bold' ? TRUE : FALSE;
       $axis['textStyle']['italic'] = $chart[$key]['#labels_font_style'] === 'italic' ? TRUE : FALSE;
       $axis['textStyle']['fontSize'] = $chart[$key]['#labels_font_size'];
-      $axis['slantedText'] = isset($chart[$key]['#labels_rotation']) ? TRUE : NULL;
+      $axis['slantedText'] = !empty($chart[$key]['#labels_rotation']) ? TRUE : NULL;
       $axis['slantedTextAngle'] = $chart[$key]['#labels_rotation'];
       $axis['gridlines']['color'] = $chart[$key]['#grid_line_color'];
       $axis['baselineColor'] = $chart[$key]['#base_line_color'];
