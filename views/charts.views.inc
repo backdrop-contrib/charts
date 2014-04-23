@@ -20,7 +20,7 @@ function charts_views_plugins() {
     'uses row class' => FALSE,
     'uses fields' => TRUE,
     'uses options' => TRUE,
-    'uses grouping' => FALSE,
+    'uses grouping' => TRUE,
     'type' => 'normal',
   );
   $plugins['style']['chart_extension'] = $plugins['style']['chart'];
