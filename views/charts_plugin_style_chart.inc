@@ -165,6 +165,8 @@ class charts_plugin_style_chart extends views_plugin_style {
       '#id' => drupal_clean_css_identifier('chart_' . $chart_id),
       '#title' => $this->options['title_position'] ? $this->options['title'] : FALSE,
       '#title_position' => $this->options['title_position'],
+      '#tooltips' => $this->options['tooltips'],
+      '#data_labels' => $this->options['data_labels'],
       '#colors' => $this->options['colors'],
       '#background' => $this->options['background'] ? $this->options['background'] : 'transparent',
       '#legend' => $this->options['legend_position'] ? TRUE : FALSE,
