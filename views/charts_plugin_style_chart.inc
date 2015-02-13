@@ -173,6 +173,7 @@ class charts_plugin_style_chart extends views_plugin_style {
       '#legend_position' => $this->options['legend_position'] ? $this->options['legend_position'] : NULL,
       '#width' => $this->options['width'],
       '#height' => $this->options['height'],
+      '#view' => $this->view, // pass info about the actual view results to allow further processing
     );
     $chart_type_info = chart_get_type($this->options['type']);
 
