@@ -229,9 +229,8 @@ class charts_plugin_style_chart extends views_plugin_style {
       $sets = $this->render_grouping($this->view->result, $this->options['grouping'], TRUE);
       foreach ($sets as $series_label => $data_set) {
         $series_index = isset($series_index) ? $series_index + 1 : 0;
-        $series_key = $this->view->current_display . '__' . $field_key . '_' . $series_index;
         foreach ($data_fields as $field_key => $field_handler) {
-          $chart[$series_key] = array(
+          $chart[$this->view->current_display . '__' . $field_key . '_' . $series_index] = array(
             '#type' => 'chart_data',
             '#data' => array(),
             // If using a grouping field, inherit from the chart level colors.
@@ -266,7 +265,7 @@ class charts_plugin_style_chart extends views_plugin_style {
             else {
               $value = (float) str_replace(array(',', ' '), '', $value);
             }
-            $chart[$series_key]['#data'][] = $value;
+            $chart[$this->view->current_display . '__' . $field_key . '_' . $series_index]['#data'][] = $value;
           }
           $row_number++;
         }
