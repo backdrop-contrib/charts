@@ -27,7 +27,7 @@ Drupal.behaviors.chartsGoogle.attach = function(context, settings) {
   });
 
   function renderCharts() {
-    $('.charts-google').once('charts-google', function() {
+    $('.charts-google', context).once('charts-google', function() {
       if ($(this).attr('data-chart')) {
         var config = $.parseJSON($(this).attr('data-chart'));
         var wrap = new google.visualization.ChartWrapper();
