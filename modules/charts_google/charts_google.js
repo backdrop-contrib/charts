@@ -88,6 +88,7 @@ Drupal.behaviors.chartsGoogle.attach = function(context, settings) {
                 dataTable.insertColumn(columnIndex + 1, {
                   type: 'string',
                   role: role,
+                  p: {html: config.options.tooltip.isHtml}
                 });
                 for (var rowIndex in columnsToAdd[columnIndex][role]) {
                   dataTable.setCell(parseInt(rowIndex) - 1, columnIndex + 1, columnsToAdd[columnIndex][role][rowIndex]);
