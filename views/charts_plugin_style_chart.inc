@@ -343,13 +343,13 @@ class charts_plugin_style_chart extends views_plugin_style {
   function get_parent_chart_display() {
     $parent_display = FALSE;
     if ($this->plugin_name === 'chart_extension' && $this->display && $this->display->handler->options['parent_display']) {
-      $parent_display_name = $this->display->handler->options['parent_display'];
+      $parent_display_name = $this->display->handler->get_option('parent_display');
       if (isset($this->view->display[$parent_display_name])) {
         $parent_display = $this->view->display[$parent_display_name];
       }
     }
     // Ensure the parent is a chart.
-    if ($parent_display && $parent_display->display_options['style_plugin'] !== 'chart') {
+    if ($parent_display && $parent_display->handler->get_option('style_plugin') !== 'chart') {
       $parent_display = FALSE;
     }
     return $parent_display;
