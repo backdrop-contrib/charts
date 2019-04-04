@@ -78,7 +78,7 @@ function charts_views_default_views() {
   $handler->display->display_options['header']['area']['table'] = 'views';
   $handler->display->display_options['header']['area']['field'] = 'area';
   $handler->display->display_options['header']['area']['content'] = 'These charts are created using Views. This example may be edited through the Views UI.';
-  $handler->display->display_options['header']['area']['format'] = '2';
+  $handler->display->display_options['header']['area']['format'] = 'plain_text';
   $handler->display->display_options['path'] = 'charts/examples/views';
   $handler->display->display_options['menu']['type'] = 'tab';
   $handler->display->display_options['menu']['title'] = 'Views example';
