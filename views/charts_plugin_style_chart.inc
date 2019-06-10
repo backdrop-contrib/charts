@@ -298,6 +298,18 @@ class charts_plugin_style_chart extends views_plugin_style {
         }
       }
 
+      // Inherit arguments and exposed filters if set to.
+      if ($child_display->handler->get_option('inherit_arguments')) {
+        $subview->original_args = $subview->args;
+        $args = $this->view->args;
+        $subview->set_arguments($args);
+      }
+      // Exposed filters.
+      if ($child_display->handler->get_option('inherit_exposed_filters')) {
+        $exposed_input = $this->view->exposed_input;
+        $subview->set_exposed_input($exposed_input);
+      }
+
       // Execute the subview and get the result.
       $subview->pre_execute();
       $subview->execute();
