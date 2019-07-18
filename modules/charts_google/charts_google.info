@@ -1,5 +1,6 @@
 name = Google Charts
 description = Charts module integration with Google Charts.
 package = Charts
-core = 7.x
+backdrop = 1.x
+type = module
 dependencies[]  = charts

@@ -28,8 +28,14 @@ class charts_plugin_display_chart extends views_plugin_display {
     $options['parent_display'] = array('default' => '');
     $options['inherit_yaxis'] = array('default' => '1');
 
-    $options['inherit_arguments'] = array('default' => TRUE, 'bool' => TRUE);
-    $options['inherit_exposed_filters'] = array('default' => TRUE, 'bool' => TRUE);
+    $options['inherit_arguments'] = array(
+      'default' => TRUE,
+      'bool' => TRUE,
+    );
+    $options['inherit_exposed_filters'] = array(
+      'default' => TRUE,
+      'bool' => TRUE,
+    );
 
     return $options;
   }

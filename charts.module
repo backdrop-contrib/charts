@@ -24,7 +24,7 @@ function charts_menu() {
   $items['admin/config/content/charts'] = array(
     'title' => 'Default chart configuration',
     'description' => 'Set the default library, behavior, and style of charts.',
-    'page callback' => 'drupal_get_form',
+    'page callback' => 'backdrop_get_form',
     'page arguments' => array('charts_default_settings_form'),
     'access arguments' => array('administer charts'),
     'file' => 'includes/charts.pages.inc',
@@ -61,7 +61,7 @@ function charts_element_info() {
     '#font' => 'Arial',
     '#font_size' => 12, // Font size in pixels, e.g. 12.
     '#background' => 'transparent',
-    '#stacking' => NULL, // Bar chart only. Set to TRUE to stack. 
+    '#stacking' => NULL, // Bar chart only. Set to TRUE to stack.
     '#pre_render' => array('charts_pre_render_element'),
     '#tooltips' => TRUE,
     '#tooltips_use_html' => FALSE,
@@ -77,7 +77,6 @@ function charts_element_info() {
     '#legend_font_size' => NULL, // CSS value for font size, e.g. 1em or 12px.
     '#width' => NULL,
     '#height' => NULL,
-
     '#attributes' => array(), // Applied to the wrapper, not the chart.
     '#chart_library' => NULL, // If requiring a particular charting module.
     '#raw_options' => array(), // Raw library-specific options passed directly.
@@ -121,7 +120,6 @@ function charts_element_info() {
     '#line_width' => 1, // Line chart only.
     '#marker_radius' => 3, // Line chart only. Size in pixels, e.g. 1, 5.
     '#target_axis' => NULL, // If using multiple axes, key for the matching y axis.
-
     // Formatting options.
     '#decimal_count' => NULL, // The number of digits after the decimal separator. e.g. 2
     '#date_format' => NULL, // A custom date format, e.g. %Y-%m-%d
@@ -145,7 +143,11 @@ function charts_library() {
     'title' => t('Charts admin integration'),
     'version' => '1.0',
     'js' => array(
-      array('data' => drupal_get_path('module', 'charts') . '/js/charts.admin.js', 'type' => 'file', 'weight' => 10),
+      array(
+        'data' => backdrop_get_path('module', 'charts') . '/js/charts.admin.js',
+        'type' => 'file',
+        'weight' => 10,
+      ),
     ),
   );
 
@@ -188,7 +190,7 @@ function charts_theme() {
 function charts_views_api() {
   return array(
     'api' => 3.0,
-    'path' => drupal_get_path('module', 'charts') . '/views',
+    'path' => backdrop_get_path('module', 'charts') . '/views',
   );
 }
 
@@ -239,11 +241,11 @@ function charts_pre_render_element($element) {
   if ($element['#chart_id']) {
     $alter_hooks[] = 'chart_' . $element['#chart_id'];
   }
-  drupal_alter($alter_hooks, $element, $element['#chart_id']);
+  backdrop_alter($alter_hooks, $element, $element['#chart_id']);
 
   // Include the library specific file and render via their callback.
   if (isset($chart_library_info['file'])) {
-    $module_path = drupal_get_path('module', $chart_library_info['module']);
+    $module_path = backdrop_get_path('module', $chart_library_info['module']);
     include_once $module_path . '/' . $chart_library_info['file'];
   }
   $callback = $chart_library_info['render'];
@@ -258,10 +260,10 @@ function charts_pre_render_element($element) {
     if ($element['#chart_id']) {
       $alter_hooks[] = 'chart_definition_' . $element['#chart_id'];
     }
-    drupal_alter($alter_hooks, $chart_definition, $element, $element['#chart_id']);
+    backdrop_alter($alter_hooks, $chart_definition, $element, $element['#chart_id']);
 
     // Set the element #chart_json property as a data-attribute.
-    $element['#attributes']['data-chart'] = drupal_json_encode($chart_definition);
+    $element['#attributes']['data-chart'] = backdrop_json_encode($chart_definition);
   }
 
   return $element;
@@ -281,7 +283,7 @@ function charts_info() {
     }
     $charts_info = array_merge($charts_info, $module_charts_info);
   }
-  drupal_alter('charts_info', $charts_info);
+  backdrop_alter('charts_info', $charts_info);
   return $charts_info;
 }
 
@@ -309,7 +311,7 @@ function charts_type_info() {
       'stacking' => FALSE,
     );
   }
-  drupal_alter('charts_type_info', $charts_type_info);
+  backdrop_alter('charts_type_info', $charts_type_info);
   return $charts_type_info;
 }
 
@@ -357,18 +359,36 @@ function charts_charts_type_info() {
 }
 
 /**
+ * Implements hook_config_info().
+ */
+function charts_config_info() {
+  $prefixes['charts.settings'] = array(
+    'label' => t('Module name settings'),
+    'group' => t('Configuration'),
+  );
+}
+
+/**
  * Default colors used in all libraries.
  */
 function charts_default_colors() {
-  $form = variable_get('charts_default_settings');   
-    
+  $form = config_get('charts.settings', 'charts_default_settings');
+
   if (isset($form['colors'])) {
-    return $form['colors'];  
+    return $form['colors'];
   }
   else {
     return array(
-      '#2f7ed8', '#0d233a', '#8bbc21','#910000', '#1aadce',
-      '#492970', '#f28f43', '#77a1e5', '#c42525', '#a6c96a',
+      '#2f7ed8',
+      '#0d233a',
+      '#8bbc21',
+      '#910000',
+      '#1aadce',
+      '#492970',
+      '#f28f43',
+      '#77a1e5',
+      '#c42525',
+      '#a6c96a',
     );
   }
 }
@@ -400,14 +420,12 @@ function charts_cast_element_integer_values(&$element) {
     '#legend_font_size',
     '#width',
     '#height',
-
     // Axis options.
     '#title_font_size',
     '#labels_font_size',
     '#labels_rotation',
     '#max',
     '#min',
-
     // Data options.
     '#decimal_count',
   );
@@ -432,5 +450,15 @@ function theme_charts_chart($variables) {
   $attributes['id'] = $element['#id'];
   $attributes['class'][] = 'chart';
 
-  return '<div ' . drupal_attributes($attributes) . '>' . (isset($element['#chart']) ? $element['#chart'] : '') . '</div>';
+  return '<div ' . backdrop_attributes($attributes) . '>' . (isset($element['#chart']) ? $element['#chart'] : '') . '</div>';
+}
+
+/**
+ * Implements hook_autoload_info().
+ */
+function charts_autoload_info() {
+  return array(
+    'charts_plugin_display_chart' => 'views/charts_plugin_display_chart.inc',
+    'charts_plugin_style_chart' => 'views/charts_plugin_style_chart.inc',
+  );
 }

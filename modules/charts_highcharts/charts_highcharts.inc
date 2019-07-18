@@ -35,7 +35,7 @@ function _charts_highcharts_render($chart) {
   $chart_definition['series'] = $series;
 
   if (!isset($chart['#id'])) {
-    $chart['#id'] = drupal_html_id('highchart-render');
+    $chart['#id'] = backdrop_html_id('highchart-render');
   }
 
   $chart['#attached']['library'][] = array('charts_highcharts', 'charts_highcharts');
@@ -46,7 +46,7 @@ function _charts_highcharts_render($chart) {
 }
 
 /**
- * Utility to convert a Drupal renderable type to a Google visualization type.
+ * Utility to convert a Backdrop renderable type to a Google visualization type.
  */
 function _charts_highcharts_type($renderable_type) {
   $types = array(
@@ -57,7 +57,7 @@ function _charts_highcharts_type($renderable_type) {
     'pie_chart' => 'PieChart',
     'scatter_chart' => 'ScatterChart',
   );
-  drupal_alter('charts_highcharts_types', $types);
+  backdrop_alter('charts_highcharts_types', $types);
   return isset($types[$renderable_type]) ? $types[$renderable_type] : FALSE;
 }
 
@@ -72,7 +72,7 @@ function _charts_highcharts_populate_chart_options($chart, $chart_definition) {
   $chart_definition['title']['style']['fontStyle'] = $chart['#title_font_style'];
   $chart_definition['title']['style']['fontSize'] = $chart['#title_font_size'];
   $chart_definition['title']['verticalAlign'] = $chart['#title_position'] === 'in' ? 'top' : NULL;
-  $chart_definition['title']['y'] = $chart['#title_position'] === 'in' ? 24: NULL;
+  $chart_definition['title']['y'] = $chart['#title_position'] === 'in' ? 24 : NULL;
   $chart_definition['colors'] = $chart['#colors'];
   $chart_definition['chart']['style']['fontFamily'] = $chart['#font'];
   $chart_definition['chart']['style']['fontSize'] = $chart['#font_size'];
@@ -117,7 +117,7 @@ function _charts_highcharts_populate_chart_options($chart, $chart_definition) {
 
   // Merge in chart raw options.
   if (isset($chart['#raw_options'])) {
-    $chart_definition = drupal_array_merge_deep($chart_definition, $chart['#raw_options']);
+    $chart_definition = backdrop_array_merge_deep($chart_definition, $chart['#raw_options']);
   }
 
   return $chart_definition;
@@ -176,7 +176,7 @@ function _charts_highcharts_populate_chart_axes($chart, $chart_definition) {
 
       // Merge in axis raw options.
       if (isset($chart[$key]['#raw_options'])) {
-        $axis = drupal_array_merge_deep($axis, $chart[$key]['#raw_options']);
+        $axis = backdrop_array_merge_deep($axis, $chart[$key]['#raw_options']);
       }
 
       $chart_definition[$axisType][] = $axis;
@@ -259,7 +259,7 @@ function _charts_highcharts_populate_chart_data(&$chart, $chart_definition) {
 
       // Merge in series raw options.
       if (isset($chart[$key]['#raw_options'])) {
-        $series = drupal_array_merge_deep($series, $chart[$key]['#raw_options']);
+        $series = backdrop_array_merge_deep($series, $chart[$key]['#raw_options']);
       }
 
       // Add the series to the main chart definition.
@@ -311,7 +311,7 @@ function _charts_highcharts_populate_chart_data(&$chart, $chart_definition) {
 
           // Merge in point raw options.
           if (isset($data_item['#raw_options'])) {
-            $series_point = drupal_array_merge_deep($series_point, $data_item['#raw_options']);
+            $series_point = backdrop_array_merge_deep($series_point, $data_item['#raw_options']);
           }
         }
       }

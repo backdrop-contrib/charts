@@ -1,11 +1,11 @@
 /**
  * @file
- * JavaScript integration between Highcharts and Drupal.
+ * JavaScript integration between Highcharts and Backdrop.
  */
 (function ($) {
 
-Drupal.behaviors.chartsHighcharts = {};
-Drupal.behaviors.chartsHighcharts.attach = function(context, settings) {
+Backdrop.behaviors.chartsHighcharts = {};
+Backdrop.behaviors.chartsHighcharts.attach = function(context, settings) {
   $('.charts-highchart', context).once('charts-highchart', function() {
     if ($(this).attr('data-chart')) {
       var config = $.parseJSON($(this).attr('data-chart'));

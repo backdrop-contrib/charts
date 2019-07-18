@@ -1,5 +1,11 @@
 <?php
 /**
+ * @file
+ * Install, update and uninstall functions for the charts_highcharts module.
+ *
+ */
+
+/**
  * Installation and update hooks for the Charts Highcharts module.
  */
 

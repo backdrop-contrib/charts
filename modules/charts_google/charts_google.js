@@ -1,11 +1,11 @@
 /**
  * @file
- * JavaScript integration between Google Charts and Drupal.
+ * JavaScript integration between Google Charts and Backdrop.
  */
 (function ($) {
 
-Drupal.behaviors.chartsGoogle = {};
-Drupal.behaviors.chartsGoogle.attach = function(context, settings) {
+Backdrop.behaviors.chartsGoogle = {};
+Backdrop.behaviors.chartsGoogle.attach = function(context, settings) {
   // First time loading in Views preview may not work because the Google JS
   // API may not yet be loaded.
   if (typeof google !== 'undefined') {

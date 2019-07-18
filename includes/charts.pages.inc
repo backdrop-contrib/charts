@@ -203,7 +203,13 @@ function charts_settings_form($form, $defaults = array(), $field_options = array
   );
   $form['display']['dimensions']['width'] = array(
     '#type' => 'textfield',
-    '#attributes' => array('TYPE' => 'number', 'step' => 1, 'min' => 0, 'max' => 9999, 'placeholder' => t('auto')),
+    '#attributes' => array(
+      'TYPE' => 'number',
+      'step' => 1,
+      'min' => 0,
+      'max' => 9999,
+      'placeholder' => t('auto'),
+    ),
     '#default_value' => $options['width'],
     '#size' => 8,
     '#suffix' => ' x ',
@@ -212,7 +218,13 @@ function charts_settings_form($form, $defaults = array(), $field_options = array
   );
   $form['display']['dimensions']['height'] = array(
     '#type' => 'textfield',
-    '#attributes' => array('TYPE' => 'number', 'step' => 1, 'min' => 0, 'max' => 9999, 'placeholder' => t('auto')),
+    '#attributes' => array(
+      'TYPE' => 'number',
+      'step' => 1,
+      'min' => 0,
+      'max' => 9999,
+      'placeholder' => t('auto'),
+    ),
     '#default_value' => $options['height'],
     '#size' => 8,
     '#suffix' => ' px',
@@ -268,7 +280,11 @@ function charts_settings_form($form, $defaults = array(), $field_options = array
   );
   $form['yaxis']['minmax']['min'] = array(
     '#type' => 'textfield',
-    '#attributes' => array('TYPE' => 'number', 'max' => 999999, 'placeholder' => t('Minimum')),
+    '#attributes' => array(
+      'TYPE' => 'number',
+      'max' => 999999,
+      'placeholder' => t('Minimum'),
+    ),
     '#default_value' => $options['yaxis_min'],
     '#size' => 12,
     '#parents' => array_merge($parents, array('yaxis_min')),
@@ -277,7 +293,11 @@ function charts_settings_form($form, $defaults = array(), $field_options = array
   );
   $form['yaxis']['minmax']['max'] = array(
     '#type' => 'textfield',
-    '#attributes' => array('TYPE' => 'number', 'max' => 999999, 'placeholder' => t('Maximum')),
+    '#attributes' => array(
+      'TYPE' => 'number',
+      'max' => 999999,
+      'placeholder' => t('Maximum'),
+    ),
     '#default_value' => $options['yaxis_max'],
     '#size' => 12,
     '#parents' => array_merge($parents, array('yaxis_max')),
@@ -300,7 +320,13 @@ function charts_settings_form($form, $defaults = array(), $field_options = array
   $form['yaxis']['decimal_count'] = array(
     '#title' => t('Decimal count'),
     '#type' => 'textfield',
-    '#attributes' => array('TYPE' => 'number', 'step' => 1, 'min' => 0, 'max' => 20, 'placeholder' => t('auto')),
+    '#attributes' => array(
+      'TYPE' => 'number',
+      'step' => 1,
+      'min' => 0,
+      'max' => 20,
+      'placeholder' => t('auto'),
+    ),
     '#default_value' => $options['yaxis_decimal_count'],
     '#size' => 5,
     '#description' => t('Enforce a certain number of decimal-place digits in displayed values.'),
@@ -329,7 +355,7 @@ function charts_settings_form($form, $defaults = array(), $field_options = array
  * Menu callback; Configure the site-wide defaults for charts.
  */
 function charts_default_settings_form($form, $form_state) {
-  $defaults = variable_get('charts_default_settings', array());
+  $defaults = config_get('charts.settings', 'charts_default_settings');
   $defaults += charts_default_settings();
   $field_options = array();
   $parents = array('charts_default_settings');
@@ -370,7 +396,7 @@ function charts_default_settings_form($form, $form_state) {
  * Submit handler for charts_default_settings_form().
  */
 function charts_default_settings_form_submit($form, $form_state) {
-  variable_set('charts_default_settings', $form_state['values']['charts_default_settings']);
+  config_set('charts.settings', 'charts_default_settings', $form_state['values']['charts_default_settings']);
 }
 
 /**
@@ -406,7 +432,7 @@ function charts_default_settings() {
   $defaults['yaxis_decimal_count'] = '';
   $defaults['yaxis_labels_rotation'] = 0;
 
-  drupal_alter('charts_default_settings', $defaults);
+  backdrop_alter('charts_default_settings', $defaults);
   return $defaults;
 }
 
@@ -421,9 +447,18 @@ function theme_charts_settings_fields($variables) {
   );
   $table['header'] = array(
     array('data' => t('Field name')),
-    array('data' => t('Provides labels'), 'class' => array('chart-label-field', 'checkbox')),
-    array('data' => t('Provides data'), 'class' => array('chart-data-field', 'checkbox')),
-    array('data' => t('Color'), 'class' => array('chart-field-color', 'checkbox')),
+    array(
+      'data' => t('Provides labels'),
+      'class' => array('chart-label-field', 'checkbox'),
+    ),
+    array(
+      'data' => t('Provides data'),
+      'class' => array('chart-data-field', 'checkbox'),
+    ),
+    array(
+      'data' => t('Color'),
+      'class' => array('chart-field-color', 'checkbox'),
+    ),
   );
   foreach ($element['label_field']['#options'] as $field_name => $field_label) {
     $element['label_field'][$field_name]['#title_display'] = 'attribute';
@@ -435,15 +470,15 @@ function theme_charts_settings_fields($variables) {
       'data' => $field_label,
     );
     $row[] = array(
-      'data' => drupal_render($element['label_field'][$field_name]),
+      'data' => backdrop_render($element['label_field'][$field_name]),
       'class' => array('chart-label-field', 'checkbox'),
     );
     $row[] = array(
-      'data' => $field_name ? drupal_render($element['data_fields'][$field_name]) : '',
+      'data' => $field_name ? backdrop_render($element['data_fields'][$field_name]) : '',
       'class' => array('chart-data-field', 'checkbox'),
     );
     $row[] = array(
-      'data' => $field_name ? drupal_render($element['field_colors'][$field_name]) : '',
+      'data' => $field_name ? backdrop_render($element['field_colors'][$field_name]) : '',
       'class' => array('chart-field-color', 'checkbox'),
     );
     $table['rows'][] = $row;
@@ -457,5 +492,5 @@ function theme_charts_settings_fields($variables) {
     '#description' => t('Any field may be used to provide labels. Usually this is the first field configured in the view. e.g. Month names, types of content, etc. Subsequent fields typically provide numeric data which can be charted. In some chart types, no label field may be used at all to utilize a continuous axis.'),
   );
 
-  return drupal_render($wrapper);
+  return backdrop_render($wrapper);
 }

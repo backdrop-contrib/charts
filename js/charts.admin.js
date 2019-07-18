@@ -4,14 +4,14 @@
  */
 (function ($) {
 
-Drupal.behaviors.chartsAdmin = {};
-Drupal.behaviors.chartsAdmin.attach = function(context, settings) {
+Backdrop.behaviors.chartsAdmin = {};
+Backdrop.behaviors.chartsAdmin.attach = function(context, settings) {
   // Change options based on the chart type selected.
   $(context).find('.form-radios.chart-type-radios').once('charts-axis-inverted', function() {
 
     // Manually attach collapsible fieldsets first.
-    if (Drupal.behaviors.collapse) {
-      Drupal.behaviors.collapse.attach(context, settings);
+    if (Backdrop.behaviors.collapse) {
+      Backdrop.behaviors.collapse.attach(context, settings);
     }
 
     var xAxisLabel = $('fieldset.chart-xaxis .fieldset-title').html();

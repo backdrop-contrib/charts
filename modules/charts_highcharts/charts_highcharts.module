@@ -27,10 +27,16 @@ function charts_highcharts_library() {
       'website' => $highcharts_info['vendor url'],
       'version' => $highcharts_info['version'],
       'js' => array(
-        array('data' => $highcharts_info['library path'] . '/js/highcharts.js', 'type' => 'file'),
+        array(
+          'data' => $highcharts_info['library path'] . '/js/highcharts.js',
+          'type' => 'file',
+        ),
       ),
       'css' => array(
-        array('data' => $highcharts_info['library path'] . '/css/highcharts.css', 'type' => 'file'),
+        array(
+          'data' => $highcharts_info['library path'] . '/css/highcharts.css',
+          'type' => 'file',
+        ),
       ),
     );
   }
@@ -38,7 +44,10 @@ function charts_highcharts_library() {
     'title' => t('Highcharts integration'),
     'version' => '1.0',
     'js' => array(
-      array('data' => drupal_get_path('module', 'charts_highcharts') . '/charts_highcharts.js', 'type' => 'file'),
+      array(
+        'data' => backdrop_get_path('module', 'charts_highcharts') . '/charts_highcharts.js',
+        'type' => 'file',
+      ),
     ),
     'dependencies' => array(
       array('charts_highcharts', 'highcharts'),

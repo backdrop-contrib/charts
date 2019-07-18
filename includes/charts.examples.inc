@@ -32,7 +32,7 @@ function charts_examples($library = NULL, $id = NULL) {
           $notes = '<p>' . t('Note') . ': ' . $example['notes'][$library] . '</p>';
         }
         $row[] = array(
-          'data' => drupal_render($example['chart']) . l(t('View'), 'charts/examples/built-in/' . $library . '/' . str_replace('_charts_examples_', '', $function)) . $notes,
+          'data' => backdrop_render($example['chart']) . l(t('View'), 'charts/examples/built-in/' . $library . '/' . str_replace('_charts_examples_', '', $function)) . $notes,
           'valign' => 'top',
         );
       }

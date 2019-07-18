@@ -24,7 +24,7 @@ function _charts_google_render($chart) {
   $chart_definition = _charts_google_populate_chart_data($chart, $chart_definition);
 
   if (!isset($chart['#id'])) {
-    $chart['#id'] = drupal_html_id('google-chart-render');
+    $chart['#id'] = backdrop_html_id('google-chart-render');
   }
 
   // Trim out empty options.
@@ -38,7 +38,7 @@ function _charts_google_render($chart) {
 }
 
 /**
- * Utility to convert a Drupal renderable type to a Google visualization type.
+ * Utility to convert a Backdrop renderable type to a Google visualization type.
  */
 function _charts_google_visualization_type($renderable_type) {
   $types = array(
@@ -49,7 +49,7 @@ function _charts_google_visualization_type($renderable_type) {
     'pie' => 'PieChart',
     'scatter' => 'ScatterChart',
   );
-  drupal_alter('charts_google_visualization_types', $types);
+  backdrop_alter('charts_google_visualization_types', $types);
   return isset($types[$renderable_type]) ? $types[$renderable_type] : FALSE;
 }
 
@@ -92,7 +92,7 @@ function _charts_google_populate_chart_options($chart, $chart_definition) {
 
   // Merge in chart raw options.
   if (isset($chart['#raw_options'])) {
-    $chart_definition['options'] = drupal_array_merge_deep($chart_definition['options'], $chart['#raw_options']);
+    $chart_definition['options'] = backdrop_array_merge_deep($chart_definition['options'], $chart['#raw_options']);
   }
 
   return $chart_definition;
@@ -137,7 +137,7 @@ function _charts_google_populate_chart_axes($chart, $chart_definition) {
 
       // Merge in axis raw options.
       if (isset($chart[$key]['#raw_options'])) {
-        $axis = drupal_array_merge_deep($axis, $chart[$key]['#raw_options']);
+        $axis = backdrop_array_merge_deep($axis, $chart[$key]['#raw_options']);
       }
 
       // Multi-axis support only applies to the major axis in Google charts.
@@ -257,7 +257,7 @@ function _charts_google_populate_chart_data(&$chart, $chart_definition) {
 
       // Merge in series raw options.
       if (isset($chart[$key]['#raw_options'])) {
-        $series = drupal_array_merge_deep($series, $chart[$key]['#raw_options']);
+        $series = backdrop_array_merge_deep($series, $chart[$key]['#raw_options']);
       }
 
       // Add the series to the main chart definition.
@@ -284,7 +284,7 @@ function _charts_google_populate_chart_data(&$chart, $chart_definition) {
 
           // Merge in data point raw options.
           if (isset($data_item['#raw_options'])) {
-            $chart_definition['_data'][$sub_key + 1][$series_number + 1] = drupal_array_merge_deep($chart_definition['_data'][$sub_key + 1][$series_number + 1], $data_item['#raw_options']);
+            $chart_definition['_data'][$sub_key + 1][$series_number + 1] = backdrop_array_merge_deep($chart_definition['_data'][$sub_key + 1][$series_number + 1], $data_item['#raw_options']);
           }
 
           charts_trim_array($chart_definition['_data'][$sub_key + 1][$series_number + 1]);

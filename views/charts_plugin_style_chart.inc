@@ -18,7 +18,7 @@ class charts_plugin_style_chart extends views_plugin_style {
 
     // Get the default chart values
     module_load_include('inc', 'charts', 'includes/charts.pages');
-    $defaults = variable_get('charts_default_settings', array());
+    $defaults = config_get('charts.settings', 'charts_default_settings');
     $defaults += charts_default_settings();
     foreach ($defaults as $default_key => $default_value) {
       $options[$default_key]['default'] = $default_value;
@@ -162,7 +162,7 @@ class charts_plugin_style_chart extends views_plugin_style {
       '#chart_type' => $this->options['type'],
       '#chart_library' => $this->options['library'],
       '#chart_id' => $chart_id,
-      '#id' => drupal_clean_css_identifier('chart_' . $chart_id),
+      '#id' => backdrop_clean_css_identifier('chart_' . $chart_id),
       '#title' => $this->options['title_position'] ? $this->options['title'] : FALSE,
       '#title_position' => $this->options['title_position'],
       '#tooltips' => $this->options['tooltips'],

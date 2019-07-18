@@ -24,5 +24,21 @@ function charts_requirements($phase) {
 /**
  * Implements hook_uninstall().
  */
-function charts_uninstall() {
+function charts_uninstall() { }
+
+/**
+ * Implements hook_update_N().
+ */
+function charts_update_1000() {
+  $config = config('charts.settings');
+  $config->set('charts_default_settings', update_variable_get('charts_default_settings', 'dynamic value in file /charts/views/charts_plugin_style_chart.inc line 21'));
+  update_variable_del('charts_default_settings');
+}
+
+/**
+ * Implements hook_install().
+ */
+function charts_install() {
+  // Dynamically generated variable data was detected.
+  // /charts/views/charts_plugin_style_chart.inc line 21
 }
