@@ -136,9 +136,9 @@ function charts_element_info() {
 }
 
 /**
- * Implements hook_library().
+ * Implements hook_library_info().
  */
-function charts_library() {
+function charts_library_info() {
   $library['charts.admin'] = array(
     'title' => t('Charts admin integration'),
     'version' => '1.0',

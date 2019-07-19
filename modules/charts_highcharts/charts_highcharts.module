@@ -18,9 +18,9 @@ function charts_highcharts_charts_info() {
 }
 
 /**
- * Implements hook_library().
+ * Implements hook_library_info().
  */
-function charts_highcharts_library() {
+function charts_highcharts_library_info() {
   if ($highcharts_info = libraries_detect('highcharts')) {
     $library['highcharts'] = array(
       'title' => t('Highcharts library'),

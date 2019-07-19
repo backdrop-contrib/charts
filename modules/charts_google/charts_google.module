@@ -14,9 +14,9 @@ function charts_google_charts_info() {
 }
 
 /**
- * Implements hook_library().
+ * Implements hook_library_info().
  */
-function charts_google_library() {
+function charts_google_library_info() {
   $library['visualization'] = array(
     'title' => t('Google Visualization library'),
     'website' => 'https://google-developers.appspot.com/chart/',
